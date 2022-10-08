@@ -9,10 +9,10 @@ import { ConnectButton, useConnectModal } from '@web3modal/react'
 
 interface TxRowData {
   txID: string;
-  value: ethers.utils.BigNumber;
-  valueUSDCents: ethers.utils.BigNumber;
-  gasFeeETHwei: ethers.utils.BigNumber;
-  gasFeeUSDCents: ethers.utils.BigNumber;
+  value: ethers.BigNumber;
+  valueUSDCents: ethers.BigNumber;
+  gasFeeETHwei: ethers.BigNumber;
+  gasFeeUSDCents: ethers.BigNumber;
   timestamp: Date;
   from: string | undefined;
   to: string | undefined;
@@ -219,7 +219,7 @@ function splitToMultipleIDs(strIn: string): string[] {
 }
 
 //TODO: May need to rethink how this works while still avoiding issues with BigNumbers only handling integer values. Maybe inverse?
-async function getWeiPriceInUSDCents(blockNumber : number | undefined) : Promise<ethers.utils.BigNumberish> {
+async function getWeiPriceInUSDCents(blockNumber : number | undefined) : Promise<ethers.BigNumberish> {
   return 1; //temporary placeholder
 }
 
