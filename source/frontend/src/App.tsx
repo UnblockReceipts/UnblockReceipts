@@ -5,14 +5,19 @@ import unblockReceiptLogo from "./images/unblockReceiptLogo.png";
 import './App.css';
 import { ethers } from 'ethers';
 
+interface TxRowData {
+  txID: string;
+  gasFeeETHwei: ethers.utils.BigNumber;
+  gasFeeUSDCents: ethers.utils.BigNumber;
+  timestamp: Date;
+  from: string | undefined;
+  to: string | undefined;
+}
+
 function App() {
   const txID = checkURLForTxID();
   const [txData, setTxData] = useState(function generateEmptyTxData() {
-    return {
-      gasFeeETHwei: new ethers.utils.BigNumber(0),
-      gasFeeUSDCents: new ethers.utils.BigNumber(0),
-      timestamp: new Date(0),
-    }
+    return [] as TxRowData[];
   });
   console.log('txHash:',txID);
   //Example txn to use: 0x60286c0fee3a46697e3ea4b04bc229f5db4b65d001d93563351fb66d81bf06b2
@@ -38,7 +43,8 @@ function App() {
     const gasFeeETHwei = gasUsed.mul(gasPrice);
     const gasFeeUSDCents = gasFeeETHwei.mul(weiPriceInUSDCents);
     console.log('gasPrice', gasPrice, 'gasUsed', gasUsed, 'gasFeeETHwei', gasFeeETHwei);
-    const txData =  {
+    const txData = [{
+      txID: txHash,
       value: txn.value,
       gasUsed: receipt.gasUsed,
       //cumulativeGasUsed: receipt.cumulativeGasUsed, //includes txes before the current one in the same block.
@@ -47,7 +53,9 @@ function App() {
       gasFeeETHwei,
       gasFeeUSDCents,
       timestamp: new Date(block.timestamp*1000),
-    };
+      to: receipt.to,
+      from: receipt.from,
+    }];
     console.log('txData:',txData);
     setTxData(txData);
     return txData;
@@ -99,14 +107,26 @@ function App() {
     );
   } else {
     return (
-      <div className="singleTxReceipt">
-        You are viewing a receipt for tx <span className="txID">{txID}</span>.
+      <div>
+        {
+          txData.map(getTxRow)
+        }
+      </div>
+    );
+  }
+}
+
+function getTxRow(txData: TxRowData) {
+    return (
+      <div className="singleTxReceipt" key={txData.txID}>
+        You are viewing a receipt for tx <span className="txID">{txData.txID}</span>.
         <p> This transaction took place on {txData.timestamp.toString()}.</p>
+        <p> From: {txData.from}</p>
+        <p> To: {txData.to}</p>
         <p> Gas fee: {ethers.utils.formatUnits(txData.gasFeeETHwei, 'ether')} ETH </p>
         <p> Gas fee: {parseInt(txData.gasFeeUSDCents.toString())/100} USD </p>
       </div>
     );
-  }
 }
 
 function checkURLForTxID(): string | undefined {
