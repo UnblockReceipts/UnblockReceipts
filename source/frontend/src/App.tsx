@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import { ethers } from 'ethers';
@@ -40,6 +40,7 @@ function App() {
       setTxData(txData);
       return txData;
     }
+    useEffect(() => { getTxnData(txID); },[]); //https://stackoverflow.com/a/71434389/
   if(typeof txID === 'undefined') {
     return (
       <div className="App">
