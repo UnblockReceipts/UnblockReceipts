@@ -9,6 +9,7 @@ function App() {
     return {
       gasFeeETHwei: new ethers.utils.BigNumber(0),
       gasFeeUSDCents: new ethers.utils.BigNumber(0),
+      timestamp: new Date(0),
     }
   });
   console.log('txHash:',txID);
@@ -24,6 +25,10 @@ function App() {
     });
     const receipt = await provider.getTransactionReceipt(txHash);
     const txn = await provider.getTransaction(txHash);
+    if(typeof receipt.blockNumber === 'undefined') {
+      throw new Error ('Got undefined block number in receipt for tx '+txHash);
+    }
+    const block = await provider.getBlock(receipt.blockNumber);
     const weiPriceInUSDCents = await getWeiPriceInUSDCents(receipt.blockNumber);
     //@ts-ignore that effectiveGasPrice might be undefined - it's undocumented but sometimes there.
     const gasPrice = (typeof receipt.effectiveGasPrice === 'undefined') ? txn.gasPrice : receipt.effectiveGasPrice;
@@ -39,6 +44,7 @@ function App() {
       gasLimit: txn.gasLimit,
       gasFeeETHwei,
       gasFeeUSDCents,
+      timestamp: new Date(block.timestamp*1000),
     };
     console.log('txData:',txData);
     setTxData(txData);
@@ -61,6 +67,7 @@ function App() {
     return (
       <div className="singleTxReceipt">
         You are viewing a receipt for tx <span className="txID">{txID}</span>.
+        <p> This transaction took place on {txData.timestamp.toString()}.</p>
         <p> Gas fee: {ethers.utils.formatUnits(txData.gasFeeETHwei, 'ether')} ETH </p>
         <p> Gas fee: {parseInt(txData.gasFeeUSDCents.toString())/100} USD </p>
       </div>
