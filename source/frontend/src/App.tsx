@@ -41,8 +41,8 @@ function App() {
     const weiPriceInUSDCents = await getWeiPriceInUSDCents(receipt.blockNumber);
     //@ts-ignore that effectiveGasPrice might be undefined - it's undocumented but sometimes there.
     const gasPrice = (typeof receipt.effectiveGasPrice === 'undefined') ? txn.gasPrice : receipt.effectiveGasPrice;
-    const gasUsed = (typeof receipt.gasUsed === 'undefined') ? new ethers.utils.BigNumber(0) : receipt.gasUsed;
-    const gasFeeETHwei = gasUsed.mul(gasPrice);
+    const gasUsed = (typeof receipt.gasUsed === 'undefined') ? ethers.BigNumber.from(0) : receipt.gasUsed;
+    const gasFeeETHwei = (typeof gasPrice === 'undefined') ? ethers.BigNumber.from(0) : gasUsed.mul(gasPrice);
     const gasFeeUSDCents = gasFeeETHwei.mul(weiPriceInUSDCents);
     const valueUSDCents = txn.value.mul(weiPriceInUSDCents);
     console.log('gasPrice', gasPrice, 'gasUsed', gasUsed, 'gasFeeETHwei', gasFeeETHwei);
@@ -52,7 +52,7 @@ function App() {
       valueUSDCents,
       gasUsed: receipt.gasUsed,
       //cumulativeGasUsed: receipt.cumulativeGasUsed, //includes txes before the current one in the same block.
-      gasPriceString: txn.gasPrice.toString(),
+      gasPriceString: (typeof gasPrice === 'undefined') ? '' : gasPrice.toString(),
       gasLimit: txn.gasLimit,
       gasFeeETHwei,
       gasFeeUSDCents,
