@@ -115,7 +115,7 @@ function App() {
   } else {
     return (
       <div className="singleTxReceipt">
-        You are viewing a receipt for tx <span className="txID">{txID}</span>.
+        You are viewing a receipt for tx <span className="txID">{txData.txID}</span>.
         <p> This transaction took place on {txData.timestamp.toString()}.</p>
         <p> From: {txData.from}</p>
         <p> To: {txData.to}</p>
