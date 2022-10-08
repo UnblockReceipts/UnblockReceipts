@@ -92,8 +92,11 @@ function App() {
           <div className="homepageContent">
             Welcome to UnblockReceipts!
             <br />
-            To see a receipt for a transaction, add "/tx/" to the URL
-            followed by the transaction hash you wish to view a receipt for.
+            Paste a transaction ID in this box to see a receipt (or more than one, separated by commas):<br />
+            <input
+              id="txHashInput"
+              placeholder="e.g. 0x60286c0fee3a46697e3ea4b04bc229f5db4b65d001d93563351fb66d81bf06b2"
+            />
             <br />
             In the future, you will be able to see multiple transactions for specified account(s), starting with account(s) in your wallet:
           </div>

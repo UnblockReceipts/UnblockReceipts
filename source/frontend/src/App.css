@@ -45,6 +45,10 @@
   border-top: thin black solid;
 }
 
+#txHashInput {
+  width: 37em;
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
