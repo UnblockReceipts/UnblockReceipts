@@ -126,10 +126,10 @@ function App() {
               To
             </td>
             <td>
-              Gas fee (ETH)
+              Tx fee (ETH)
             </td>
             <td>
-              Gas fee (USD)
+              Tx fee (USD)
             </td>
           </thead>
         <tbody>
@@ -139,7 +139,7 @@ function App() {
         </tbody>
         </table>
         <p>
-          On this decentralized network, the "gas fee" incentivizes network participants to
+          On this decentralized network, the "transaction fee" (abbreviated "Tx fee") incentivizes network participants to
           do the work needed to include this transaction in the ledger.
         </p>
       </>
