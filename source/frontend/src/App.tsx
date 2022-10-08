@@ -108,18 +108,18 @@ function App() {
   } else {
     return (
       <>
-      <h1>
-        Decentralized network transaction receipt
-      </h1>
-      <div>
-        {
-          txData.map(getTxRow)
-        }
-      </div>
-      <p>
-        On this decentralized network, the "gas fee" incentivizes network participants to
-        do the work needed to include this transaction in the ledger.
-      </p>
+        <h1>
+          Decentralized network transaction receipt
+        </h1>
+        <div>
+          {
+            txData.map(getTxRow)
+          }
+        </div>
+        <p>
+          On this decentralized network, the "gas fee" incentivizes network participants to
+          do the work needed to include this transaction in the ledger.
+        </p>
       </>
     );
   }
