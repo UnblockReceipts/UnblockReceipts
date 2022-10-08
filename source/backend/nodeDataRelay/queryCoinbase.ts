@@ -8,10 +8,17 @@ async function getFormattedETHBalance() {
 		user: 'WR5CGFRJSKSID364W4CW',
 		password: '5MQCC4HB5X7RXNPDODB6SBWREAEK2LLKKDBVUIHI',
 	});
-	const balance = await provider.getBalance('0xc94770007dda54cF92009BFF0dE90c06F603a09f');
-	const balanceFormatted = ethers.utils.formatEther(balance);
-	return balanceFormatted;
+	const receipt = await provider.getTransactionReceipt('0x60286c0fee3a46697e3ea4b04bc229f5db4b65d001d93563351fb66d81bf06b2');
+	const txn = await provider.getTransaction('0x60286c0fee3a46697e3ea4b04bc229f5db4b65d001d93563351fb66d81bf06b2');
+	return  {
+		value: txn.value,
+		gasUsed: receipt.gasUsed,
+		//cumulativeGasUsed: receipt.cumulativeGasUsed, //includes txes before the current one in the same block.
+		effectiveGasPrice: receipt.effectiveGasPrice,
+		gasPrice: txn.gasPrice,
+		gasLimit: txn.gasLimit,
+	};
 }
 getFormattedETHBalance().then(function(formattedBalance) {
-	console.log('Your ETH balance is ', formattedBalance);
+	console.log('Txn data: ', formattedBalance);
 });
