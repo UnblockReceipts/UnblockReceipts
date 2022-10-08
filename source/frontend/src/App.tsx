@@ -111,7 +111,7 @@ function App() {
         <h1>
           Decentralized network transaction receipt
         </h1>
-        <table>
+        <table className="txReceiptsTable">
           <thead>
             <td>
               Transaction ID
