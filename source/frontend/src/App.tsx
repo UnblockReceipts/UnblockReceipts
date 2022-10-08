@@ -72,6 +72,8 @@ function App() {
             <br />
             To see a receipt for a transaction, add "/tx/" to the URL
             followed by the transaction hash you wish to view a receipt for.
+            <br />
+            In the future, you will be able to see multiple transactions for specified account(s), starting with account(s) in your wallet:
           </div>
           <Button
             style={{
