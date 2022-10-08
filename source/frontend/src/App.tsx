@@ -18,6 +18,28 @@ function App() {
     </div>
   );
   } else {
+    //Example txn to use: 0x60286c0fee3a46697e3ea4b04bc229f5db4b65d001d93563351fb66d81bf06b2
+    const getTxnData = async function(txHash: string) {
+      const { ethers } = require('ethers');
+      const provider = new ethers.providers.JsonRpcProvider({
+        url: 'https://mainnet.ethereum.coinbasecloud.net',
+        user: 'WR5CGFRJSKSID364W4CW',
+        password: '5MQCC4HB5X7RXNPDODB6SBWREAEK2LLKKDBVUIHI',
+      });
+      const receipt = await provider.getTransactionReceipt(txHash);
+      const txn = await provider.getTransaction(txHash);
+      const txData =  {
+        value: txn.value,
+        gasUsed: receipt.gasUsed,
+        //cumulativeGasUsed: receipt.cumulativeGasUsed, //includes txes before the current one in the same block.
+        effectiveGasPrice: receipt.effectiveGasPrice,
+        gasPrice: txn.gasPrice,
+        gasLimit: txn.gasLimit,
+      };
+      console.log(txData);
+      return txData;
+    }
+    getTxnData(txID);
     return (
       <div className="singleTxReceipt">
         You are viewing a receipt for tx <span className="txID">{txID}</span>
