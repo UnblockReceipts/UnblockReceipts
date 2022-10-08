@@ -5,6 +5,8 @@ import unblockReceiptLogo from "./images/unblockReceiptLogo.png";
 import './App.css';
 import { ethers } from 'ethers';
 
+import { ConnectButton, useConnectModal } from '@web3modal/react'
+
 interface TxRowData {
   txID: string;
   gasFeeETHwei: ethers.utils.BigNumber;
@@ -15,6 +17,9 @@ interface TxRowData {
 }
 
 function App() {
+
+  const { isOpen, open, close } = useConnectModal()
+
   const txID = checkURLForTxID();
   const [txData, setTxData] = useState(function generateEmptyTxData() {
     return [] as TxRowData[];
@@ -83,6 +88,7 @@ function App() {
             <br />
             In the future, you will be able to see multiple transactions for specified account(s), starting with account(s) in your wallet:
           </div>
+          <ConnectButton />
           <Button
             style={{
               borderRadius: 35,
