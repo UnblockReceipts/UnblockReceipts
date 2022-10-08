@@ -23,10 +23,7 @@ function App() {
   });
   console.log('txHash:',txID);
   //Example txn to use: 0x60286c0fee3a46697e3ea4b04bc229f5db4b65d001d93563351fb66d81bf06b2
-  const getTxnData = async function(txHash: string | undefined) {
-    if(typeof txHash === 'undefined') {
-      return;
-    }
+  const getTxnData = async function(txHash: string) {
     const provider = new ethers.providers.JsonRpcProvider({
       url: 'https://mainnet.ethereum.coinbasecloud.net',
       user: process.env.REACT_APP_COINBASE_CLOUD_USER,
