@@ -6,17 +6,17 @@ function App() {
   const txID = checkURLForTxID();
   console.log('txHash:',txID);
   if(typeof txID === 'undefined') {
-  return (
-    <div className="App">
-        <img src={logo} className="App-logo" alt="logo" />
-      <div className="homepageContent">
-          Welcome to UnblockReceipts!
-          <br />
-          To see a receipt for a transaction, add "/tx/" to the URL
-          followed by the transaction hash you wish to view a receipt for.
+    return (
+      <div className="App">
+          <img src={logo} className="App-logo" alt="logo" />
+        <div className="homepageContent">
+            Welcome to UnblockReceipts!
+            <br />
+            To see a receipt for a transaction, add "/tx/" to the URL
+            followed by the transaction hash you wish to view a receipt for.
+        </div>
       </div>
-    </div>
-  );
+    );
   } else {
     //Example txn to use: 0x60286c0fee3a46697e3ea4b04bc229f5db4b65d001d93563351fb66d81bf06b2
     const getTxnData = async function(txHash: string) {
