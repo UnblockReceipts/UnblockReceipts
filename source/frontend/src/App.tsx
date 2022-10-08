@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import logo from './logo.svg';
+import { Button } from "@material-ui/core";
+import Navbar from "./components/Header";
+import unblockReceiptLogo from "./images/unblockReceiptLogo.png";
 import './App.css';
 import { ethers } from 'ethers';
 
@@ -53,15 +55,45 @@ function App() {
   useEffect(() => { getTxnData(txID); },[]); //https://stackoverflow.com/a/71434389/
   if(typeof txID === 'undefined') {
     return (
+      <>
+      <Navbar />
       <div className="App">
-          <img src={logo} className="App-logo" alt="logo" />
-        <div className="homepageContent">
+        <header className="App-header">
+        {true ? (
+          <>
+          <img
+            src={unblockReceiptLogo}
+            className="App-logo"
+            alt="logo"
+            style={{ height: "180px", paddingBottom: "1rem" }}
+          />
+          <div className="homepageContent">
             Welcome to UnblockReceipts!
             <br />
             To see a receipt for a transaction, add "/tx/" to the URL
             followed by the transaction hash you wish to view a receipt for.
-        </div>
+          </div>
+          <Button
+            style={{
+              borderRadius: 35,
+              backgroundColor: "#50b5b0",
+              border: "1px solid black",
+              padding: "8px 28px",
+              fontSize: "15px",
+              color: "white",
+              textTransform: "none"
+            }}
+            variant="contained"
+          >
+            {true ? "Connect Wallet" : "Disconnect"}
+          </Button>
+          </>
+          ) : (
+              <h1>he</h1>
+          )}
+        </header>
       </div>
+      </>
     );
   } else {
     return (
@@ -75,24 +107,24 @@ function App() {
   }
 }
 
-function checkURLForTxID() : string | undefined {
+function checkURLForTxID(): string | undefined {
   const pathname = window.location.pathname;
-  const SINGLE_TX_START = '/tx/';
-  if(pathname.startsWith(SINGLE_TX_START)) {
-    let txHashEndSlash = pathname.indexOf('/', SINGLE_TX_START.length);
+  const SINGLE_TX_START = "/tx/";
+  if (pathname.startsWith(SINGLE_TX_START)) {
+    let txHashEndSlash = pathname.indexOf("/", SINGLE_TX_START.length);
     let txHashEndsBefore = pathname.length;
-    if(txHashEndSlash >= 0) {
+    if (txHashEndSlash >= 0) {
       txHashEndsBefore = txHashEndSlash;
     }
     const txHash = pathname.substring(SINGLE_TX_START.length, txHashEndsBefore);
     return txHash;
   } else {
     const urlSearchParams = new URLSearchParams(window.location.search);
-    const urlSearchParamsTx = urlSearchParams.get('tx');
-    if(urlSearchParamsTx !== null) {
+    const urlSearchParamsTx = urlSearchParams.get("tx");
+    if (urlSearchParamsTx !== null) {
       return urlSearchParamsTx;
     }
-    console.log('pathname is ',pathname);
+    console.log("pathname is ", pathname);
   }
 }
 
