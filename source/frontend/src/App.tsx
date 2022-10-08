@@ -7,6 +7,8 @@ import { ethers } from 'ethers';
 
 interface TxRowData {
   txID: string;
+  value: ethers.utils.BigNumber;
+  valueUSDCents: ethers.utils.BigNumber;
   gasFeeETHwei: ethers.utils.BigNumber;
   gasFeeUSDCents: ethers.utils.BigNumber;
   timestamp: Date;
@@ -42,10 +44,12 @@ function App() {
     const gasUsed = (typeof receipt.gasUsed === 'undefined') ? new ethers.utils.BigNumber(0) : receipt.gasUsed;
     const gasFeeETHwei = gasUsed.mul(gasPrice);
     const gasFeeUSDCents = gasFeeETHwei.mul(weiPriceInUSDCents);
+    const valueUSDCents = txn.value.mul(weiPriceInUSDCents);
     console.log('gasPrice', gasPrice, 'gasUsed', gasUsed, 'gasFeeETHwei', gasFeeETHwei);
     const txData = [{
       txID: txHash,
       value: txn.value,
+      valueUSDCents,
       gasUsed: receipt.gasUsed,
       //cumulativeGasUsed: receipt.cumulativeGasUsed, //includes txes before the current one in the same block.
       gasPriceString: txn.gasPrice.toString(),
@@ -134,7 +138,13 @@ function App() {
                 Date/Time
               </td>
               <td>
+                ETH sent (ETH)
+              </td>
+              <td>
                 Tx fee (ETH)
+              </td>
+              <td>
+                ETH sent (USD)
               </td>
               <td>
                 Tx fee (USD)
@@ -163,7 +173,9 @@ function getTxRow(txData: TxRowData) {
         <td>{txData.from}</td>
         <td>{txData.to}</td>
         <td>{txData.timestamp.toString()}</td>
+        <td>{ethers.utils.formatUnits(txData.value, 'ether')}</td>
         <td>{ethers.utils.formatUnits(txData.gasFeeETHwei, 'ether')}</td>
+        <td>${parseInt(txData.valueUSDCents.toString())/100}</td>
         <td>${parseInt(txData.gasFeeUSDCents.toString())/100}</td>
       </tr>
     );
