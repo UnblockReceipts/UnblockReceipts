@@ -1,22 +1,24 @@
 import React, { useEffect, useState } from 'react';
-import { Button } from "@material-ui/core";
 import Navbar from "./components/Header";
 import unblockReceiptLogo from "./images/unblockReceiptLogo.png";
 import './App.css';
 import { ethers } from 'ethers';
 
+import { ConnectButton, useConnectModal } from '@web3modal/react'
+
 interface TxRowData {
   txID: string;
-  value: ethers.utils.BigNumber;
-  valueUSDCents: ethers.utils.BigNumber;
-  gasFeeETHwei: ethers.utils.BigNumber;
-  gasFeeUSDCents: ethers.utils.BigNumber;
+  value: ethers.BigNumber;
+  valueUSDCents: ethers.BigNumber;
+  gasFeeETHwei: ethers.BigNumber;
+  gasFeeUSDCents: ethers.BigNumber;
   timestamp: Date;
   from: string | undefined;
   to: string | undefined;
 }
 
 function App() {
+  const { isOpen, open, close } = useConnectModal()
   const txIDs = checkURLForTxIDs();
   const [txData, setTxData] = useState(function generateEmptyTxData() {
     return [] as TxRowData[];
@@ -38,8 +40,8 @@ function App() {
     const weiPriceInUSDCents = await getWeiPriceInUSDCents(receipt.blockNumber);
     //@ts-ignore that effectiveGasPrice might be undefined - it's undocumented but sometimes there.
     const gasPrice = (typeof receipt.effectiveGasPrice === 'undefined') ? txn.gasPrice : receipt.effectiveGasPrice;
-    const gasUsed = (typeof receipt.gasUsed === 'undefined') ? new ethers.utils.BigNumber(0) : receipt.gasUsed;
-    const gasFeeETHwei = gasUsed.mul(gasPrice);
+    const gasUsed = (typeof receipt.gasUsed === 'undefined') ? ethers.BigNumber.from(0) : receipt.gasUsed;
+    const gasFeeETHwei = (typeof gasPrice === 'undefined') ? ethers.BigNumber.from(0) : gasUsed.mul(gasPrice);
     const gasFeeUSDCents = gasFeeETHwei.mul(weiPriceInUSDCents);
     const valueUSDCents = txn.value.mul(weiPriceInUSDCents);
     console.log('gasPrice', gasPrice, 'gasUsed', gasUsed, 'gasFeeETHwei', gasFeeETHwei);
@@ -49,7 +51,7 @@ function App() {
       valueUSDCents,
       gasUsed: receipt.gasUsed,
       //cumulativeGasUsed: receipt.cumulativeGasUsed, //includes txes before the current one in the same block.
-      gasPriceString: txn.gasPrice.toString(),
+      gasPriceString: (typeof gasPrice === 'undefined') ? '' : gasPrice.toString(),
       gasLimit: txn.gasLimit,
       gasFeeETHwei,
       gasFeeUSDCents,
@@ -95,20 +97,7 @@ function App() {
             <br />
             In the future, you will be able to see multiple transactions for specified account(s), starting with account(s) in your wallet:
           </div>
-          <Button
-            style={{
-              borderRadius: 35,
-              backgroundColor: "#50b5b0",
-              border: "1px solid black",
-              padding: "8px 28px",
-              fontSize: "15px",
-              color: "white",
-              textTransform: "none"
-            }}
-            variant="contained"
-          >
-            {true ? "Connect Wallet" : "Disconnect"}
-          </Button>
+          <ConnectButton />
           </>
           ) : (
               <h1>he</h1>
@@ -215,7 +204,7 @@ function splitToMultipleIDs(strIn: string): string[] {
 }
 
 //TODO: May need to rethink how this works while still avoiding issues with BigNumbers only handling integer values. Maybe inverse?
-async function getWeiPriceInUSDCents(blockNumber : number | undefined) : Promise<ethers.utils.BigNumberish> {
+async function getWeiPriceInUSDCents(blockNumber : number | undefined) : Promise<ethers.BigNumberish> {
   return 1; //temporary placeholder
 }
 

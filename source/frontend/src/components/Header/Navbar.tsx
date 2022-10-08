@@ -24,21 +24,9 @@ export default function Navbar() {
               style={{ paddingTop: ".5rem", height: "40px" }}
             />
           </Typography>
-          <Button
-            style={{
-              borderRadius: 35,
-              backgroundColor: "#50b5b0",
-              border: "1px solid black",
-              padding: "8px 28px",
-              fontSize: "15px",
-              color: "white",
-              textTransform: "none"
-            }}
-            variant="contained"
-            sx={{ height: "3rem" }}
-          >
-            {true ? "Connect Wallet" : "Disconnect"}
-          </Button>
+          <div style={{marginRight: '0', fontStyle: 'italic'}}>
+            Spend your tokens, not your time
+          </div>
         </Toolbar>
       </AppBar>
     </Box>
