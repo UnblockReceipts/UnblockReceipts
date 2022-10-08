@@ -46,7 +46,7 @@ function App() {
         gasLimit: txn.gasLimit,
         gasFeeETHwei,
       };
-      console.log('txData: '+txData);
+      console.log('txData:',txData);
       setTxData(txData);
       return txData;
     }
