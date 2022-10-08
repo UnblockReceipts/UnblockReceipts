@@ -92,8 +92,32 @@ function App() {
           <div className="homepageContent">
             Welcome to UnblockReceipts!
             <br />
-            To see a receipt for a transaction, add "/tx/" to the URL
-            followed by the transaction hash you wish to view a receipt for.
+            Paste a transaction ID in this box to see a receipt (or more than one, separated by commas):<br />
+            <input
+              id="txHashInput"
+              placeholder="e.g. 0x60286c0fee3a46697e3ea4b04bc229f5db4b65d001d93563351fb66d81bf06b2"
+              onChange={(ev: React.ChangeEvent) => {
+                const inputElement = ev.target;
+                if(!(inputElement instanceof HTMLInputElement)) {
+                  throw new Error('Input element was not of the expected type - this should never happen.');
+                }
+                const inputValue = inputElement.value;
+                const inputValueSplit = inputValue.split(',');
+                let countRightLength = 0;
+                let countWrongLength = 0;
+                for(let inputHash of inputValueSplit) {
+                  let len = inputHash.trim().length;
+                  if(len === 66) {
+                    countRightLength++;
+                  } else if (len > 0) {
+                    countWrongLength++;
+                  }
+                }
+                if(countRightLength > 0 && countWrongLength === 0) {
+                  window.location.pathname = '/tx/' + inputValue;
+                }
+              }}
+            />
             <br />
             In the future, you will be able to see multiple transactions for specified account(s), starting with account(s) in your wallet:
           </div>
@@ -109,6 +133,7 @@ function App() {
   } else {
     return (
       <>
+        {/*<Navbar />*/}
         <img
             src={unblockReceiptLogo}
             className="App-logo"
