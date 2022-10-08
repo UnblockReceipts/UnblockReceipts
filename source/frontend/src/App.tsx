@@ -53,7 +53,7 @@ function App() {
     getTxnData(txID);
     return (
       <div className="singleTxReceipt">
-        You are viewing a receipt for tx <span className="txID">{txID}</span>
+        You are viewing a receipt for tx <span className="txID">{txID}</span>.
         <p> Gas fee: {txData.gasFeeETHwei.toString()} wei </p>
       </div>
     );
