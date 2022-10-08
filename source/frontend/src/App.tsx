@@ -111,11 +111,33 @@ function App() {
         <h1>
           Decentralized network transaction receipt
         </h1>
-        <div>
+        <table>
+          <thead>
+            <td>
+              Transaction ID
+            </td>
+            <td title="This transaction took place on">
+              Date/Time
+            </td>
+            <td>
+              From
+            </td>
+            <td>
+              To
+            </td>
+            <td>
+              Gas fee (ETH)
+            </td>
+            <td>
+              Gas fee (USD)
+            </td>
+          </thead>
+        <tbody>
           {
             txData.map(getTxRow)
           }
-        </div>
+        </tbody>
+        </table>
         <p>
           On this decentralized network, the "gas fee" incentivizes network participants to
           do the work needed to include this transaction in the ledger.
@@ -127,14 +149,14 @@ function App() {
 
 function getTxRow(txData: TxRowData) {
     return (
-      <div className="singleTxReceipt" key={txData.txID}>
-        You are viewing a receipt for tx <span className="txID">{txData.txID}</span>.
-        <p> This transaction took place on {txData.timestamp.toString()}.</p>
-        <p> From: {txData.from}</p>
-        <p> To: {txData.to}</p>
-        <p> Gas fee: {ethers.utils.formatUnits(txData.gasFeeETHwei, 'ether')} ETH </p>
-        <p> Gas fee: {parseInt(txData.gasFeeUSDCents.toString())/100} USD </p>
-      </div>
+      <tr className="singleTxReceipt" key={txData.txID}>
+        <td><span className="txID">{txData.txID}</span></td>
+        <td>{txData.timestamp.toString()}</td>
+        <td>{txData.from}</td>
+        <td>{txData.to}</td>
+        <td>{ethers.utils.formatUnits(txData.gasFeeETHwei, 'ether')}</td>
+        <td>${parseInt(txData.gasFeeUSDCents.toString())/100}</td>
+      </tr>
     );
 }
 
