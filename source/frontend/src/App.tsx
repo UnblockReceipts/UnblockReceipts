@@ -96,7 +96,7 @@ function checkURLForTxID() : string | undefined {
   }
 }
 
-//TODO: May need to rethink how this works while still avoiding issues with BigNumbers only handling integer values.
+//TODO: May need to rethink how this works while still avoiding issues with BigNumbers only handling integer values. Maybe inverse?
 async function getWeiPriceInUSDCents(blockNumber : number | undefined) : Promise<ethers.utils.BigNumberish> {
   return 1; //temporary placeholder
 }
