@@ -198,7 +198,6 @@ function checkURLForTxID(): string | undefined {
     if (urlSearchParamsTx !== null) {
       return urlSearchParamsTx;
     }
-    console.log("pathname is ", pathname);
   }
 }
 
