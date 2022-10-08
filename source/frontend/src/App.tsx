@@ -17,14 +17,7 @@ interface TxRowData {
 function App() {
   const txID = checkURLForTxID();
   const [txData, setTxData] = useState(function generateEmptyTxData() {
-    return {
-      txID: '',
-      gasFeeETHwei: new ethers.utils.BigNumber(0),
-      gasFeeUSDCents: new ethers.utils.BigNumber(0),
-      timestamp: new Date(0),
-      from: '',
-      to: '',
-    } as TxRowData;
+    return [] as TxRowData[];
   });
   console.log('txHash:',txID);
   //Example txn to use: 0x60286c0fee3a46697e3ea4b04bc229f5db4b65d001d93563351fb66d81bf06b2
@@ -50,7 +43,7 @@ function App() {
     const gasFeeETHwei = gasUsed.mul(gasPrice);
     const gasFeeUSDCents = gasFeeETHwei.mul(weiPriceInUSDCents);
     console.log('gasPrice', gasPrice, 'gasUsed', gasUsed, 'gasFeeETHwei', gasFeeETHwei);
-    const txData =  {
+    const txData = [{
       txID: txHash,
       value: txn.value,
       gasUsed: receipt.gasUsed,
@@ -62,7 +55,7 @@ function App() {
       timestamp: new Date(block.timestamp*1000),
       to: receipt.to,
       from: receipt.from,
-    };
+    }];
     console.log('txData:',txData);
     setTxData(txData);
     return txData;
@@ -113,13 +106,19 @@ function App() {
       </>
     );
   } else {
-    return getTxRow(txData);
+    return (
+      <div>
+        {
+          txData.map(getTxRow)
+        }
+      </div>
+    );
   }
 }
 
 function getTxRow(txData: TxRowData) {
     return (
-      <div className="singleTxReceipt">
+      <div className="singleTxReceipt" key={txData.txID}>
         You are viewing a receipt for tx <span className="txID">{txData.txID}</span>.
         <p> This transaction took place on {txData.timestamp.toString()}.</p>
         <p> From: {txData.from}</p>
