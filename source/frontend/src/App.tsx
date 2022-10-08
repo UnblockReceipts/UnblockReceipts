@@ -11,19 +11,6 @@ function App() {
     }
   });
   console.log('txHash:',txID);
-  if(typeof txID === 'undefined') {
-    return (
-      <div className="App">
-          <img src={logo} className="App-logo" alt="logo" />
-        <div className="homepageContent">
-            Welcome to UnblockReceipts!
-            <br />
-            To see a receipt for a transaction, add "/tx/" to the URL
-            followed by the transaction hash you wish to view a receipt for.
-        </div>
-      </div>
-    );
-  } else {
     //Example txn to use: 0x60286c0fee3a46697e3ea4b04bc229f5db4b65d001d93563351fb66d81bf06b2
     const getTxnData = async function(txHash: string | undefined) {
       if(typeof txHash === 'undefined') {
@@ -53,7 +40,19 @@ function App() {
       setTxData(txData);
       return txData;
     }
-    getTxnData(txID);
+  if(typeof txID === 'undefined') {
+    return (
+      <div className="App">
+          <img src={logo} className="App-logo" alt="logo" />
+        <div className="homepageContent">
+            Welcome to UnblockReceipts!
+            <br />
+            To see a receipt for a transaction, add "/tx/" to the URL
+            followed by the transaction hash you wish to view a receipt for.
+        </div>
+      </div>
+    );
+  } else {
     return (
       <div className="singleTxReceipt">
         You are viewing a receipt for tx <span className="txID">{txID}</span>.
