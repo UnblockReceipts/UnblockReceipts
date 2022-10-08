@@ -2,14 +2,14 @@
 //Run with `npx ts-node queryCoinbase.ts`
 const { ethers } = require('ethers');
 
-async function getFormattedETHBalance() {
+async function getFormattedETHBalance(txHash: string) {
 	const provider = new ethers.providers.JsonRpcProvider({
 		url: 'https://mainnet.ethereum.coinbasecloud.net',
 		user: 'WR5CGFRJSKSID364W4CW',
 		password: '5MQCC4HB5X7RXNPDODB6SBWREAEK2LLKKDBVUIHI',
 	});
-	const receipt = await provider.getTransactionReceipt('0x60286c0fee3a46697e3ea4b04bc229f5db4b65d001d93563351fb66d81bf06b2');
-	const txn = await provider.getTransaction('0x60286c0fee3a46697e3ea4b04bc229f5db4b65d001d93563351fb66d81bf06b2');
+	const receipt = await provider.getTransactionReceipt(txHash);
+	const txn = await provider.getTransaction(txHash);
 	return  {
 		value: txn.value,
 		gasUsed: receipt.gasUsed,
@@ -19,6 +19,6 @@ async function getFormattedETHBalance() {
 		gasLimit: txn.gasLimit,
 	};
 }
-getFormattedETHBalance().then(function(formattedBalance) {
+getFormattedETHBalance('0x60286c0fee3a46697e3ea4b04bc229f5db4b65d001d93563351fb66d81bf06b2').then(function(formattedBalance) {
 	console.log('Txn data: ', formattedBalance);
 });
