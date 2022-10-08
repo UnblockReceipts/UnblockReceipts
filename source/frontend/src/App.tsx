@@ -7,6 +7,8 @@ import { ethers } from 'ethers';
 
 interface TxRowData {
   txID: string;
+  value: ethers.utils.BigNumber;
+  valueUSDCents: ethers.utils.BigNumber;
   gasFeeETHwei: ethers.utils.BigNumber;
   gasFeeUSDCents: ethers.utils.BigNumber;
   timestamp: Date;
@@ -15,16 +17,13 @@ interface TxRowData {
 }
 
 function App() {
-  const txID = checkURLForTxID();
+  const txIDs = checkURLForTxIDs();
   const [txData, setTxData] = useState(function generateEmptyTxData() {
     return [] as TxRowData[];
   });
-  console.log('txHash:',txID);
+  console.log('txHash:',txIDs);
   //Example txn to use: 0x60286c0fee3a46697e3ea4b04bc229f5db4b65d001d93563351fb66d81bf06b2
-  const getTxnData = async function(txHash: string | undefined) {
-    if(typeof txHash === 'undefined') {
-      return;
-    }
+  const getTxnData = async function(txHash: string) {
     const provider = new ethers.providers.JsonRpcProvider({
       url: 'https://mainnet.ethereum.coinbasecloud.net',
       user: process.env.REACT_APP_COINBASE_CLOUD_USER,
@@ -42,10 +41,12 @@ function App() {
     const gasUsed = (typeof receipt.gasUsed === 'undefined') ? new ethers.utils.BigNumber(0) : receipt.gasUsed;
     const gasFeeETHwei = gasUsed.mul(gasPrice);
     const gasFeeUSDCents = gasFeeETHwei.mul(weiPriceInUSDCents);
+    const valueUSDCents = txn.value.mul(weiPriceInUSDCents);
     console.log('gasPrice', gasPrice, 'gasUsed', gasUsed, 'gasFeeETHwei', gasFeeETHwei);
-    const txData = [{
+    const txData = {
       txID: txHash,
       value: txn.value,
+      valueUSDCents,
       gasUsed: receipt.gasUsed,
       //cumulativeGasUsed: receipt.cumulativeGasUsed, //includes txes before the current one in the same block.
       gasPriceString: txn.gasPrice.toString(),
@@ -55,13 +56,24 @@ function App() {
       timestamp: new Date(block.timestamp*1000),
       to: receipt.to,
       from: receipt.from,
-    }];
+    };
+    return txData;
+  }
+  const getTxnsData = async function(txHashes: string[] | undefined) {
+    if(typeof txHashes === 'undefined') {
+      return;
+    }
+    const txDataPromises : Promise<TxRowData>[] = [];
+    for(let txHash of txHashes) {
+      txDataPromises.push(getTxnData(txHash));
+    }
+    const txData = await Promise.all(txDataPromises);
     console.log('txData:',txData);
     setTxData(txData);
     return txData;
   }
-  useEffect(() => { getTxnData(txID); },[]); //https://stackoverflow.com/a/71434389/
-  if(typeof txID === 'undefined') {
+  useEffect(() => { getTxnsData(txIDs); },[]); //https://stackoverflow.com/a/71434389/
+  if(typeof txIDs === 'undefined') {
     return (
       <>
       <Navbar />
@@ -107,29 +119,77 @@ function App() {
     );
   } else {
     return (
-      <div>
-        {
-          txData.map(getTxRow)
-        }
-      </div>
+      <>
+        <img
+            src={unblockReceiptLogo}
+            className="App-logo"
+            alt="logo"
+            style={{ height: "180px", paddingBottom: "1rem" }}
+        />
+        <span className="slogan">Spend your tokens, not your time</span>
+        <h1>
+          Decentralized network transaction receipt
+        </h1>
+        <table className="txReceiptsTable">
+          <thead>
+            <tr>
+              <td>
+                Transaction ID
+              </td>
+              <td>
+                From
+              </td>
+              <td>
+                To
+              </td>
+              <td title="This transaction took place on">
+                Date/Time
+              </td>
+              <td>
+                ETH sent (ETH)
+              </td>
+              <td>
+                Tx fee (ETH)
+              </td>
+              <td>
+                ETH sent (USD)
+              </td>
+              <td>
+                Tx fee (USD)
+              </td>
+            </tr>
+          </thead>
+        <tbody>
+          {
+            txData.map(getTxRow)
+          }
+        </tbody>
+        </table>
+        <p>
+          On this decentralized network, the "transaction fee" (abbreviated "Tx fee") incentivizes network participants to
+          do the work needed to include this transaction in the ledger.
+        </p>
+      </>
     );
   }
 }
 
 function getTxRow(txData: TxRowData) {
     return (
-      <div className="singleTxReceipt" key={txData.txID}>
-        You are viewing a receipt for tx <span className="txID">{txData.txID}</span>.
-        <p> This transaction took place on {txData.timestamp.toString()}.</p>
-        <p> From: {txData.from}</p>
-        <p> To: {txData.to}</p>
-        <p> Gas fee: {ethers.utils.formatUnits(txData.gasFeeETHwei, 'ether')} ETH </p>
-        <p> Gas fee: {parseInt(txData.gasFeeUSDCents.toString())/100} USD </p>
-      </div>
+      <tr className="singleTxReceipt" key={txData.txID}>
+        <td><span className="txID">{txData.txID}</span></td>
+        <td>{txData.from}</td>
+        <td>{txData.to}</td>
+        <td>{txData.timestamp.toString()}</td>
+        <td>{ethers.utils.formatUnits(txData.value, 'ether')}</td>
+        <td>{ethers.utils.formatUnits(txData.gasFeeETHwei, 'ether')}</td>
+        <td>${parseInt(txData.valueUSDCents.toString())/100}</td>
+        <td>${parseInt(txData.gasFeeUSDCents.toString())/100}</td>
+      </tr>
     );
 }
 
-function checkURLForTxID(): string | undefined {
+function checkURLForTxIDs(): string[] | undefined {
   const pathname = window.location.pathname;
   const SINGLE_TX_START = "/tx/";
   if (pathname.startsWith(SINGLE_TX_START)) {
@@ -139,15 +199,19 @@ function checkURLForTxID(): string | undefined {
       txHashEndsBefore = txHashEndSlash;
     }
     const txHash = pathname.substring(SINGLE_TX_START.length, txHashEndsBefore);
-    return txHash;
+    return splitToMultipleIDs(txHash);
   } else {
     const urlSearchParams = new URLSearchParams(window.location.search);
     const urlSearchParamsTx = urlSearchParams.get("tx");
     if (urlSearchParamsTx !== null) {
-      return urlSearchParamsTx;
+      return splitToMultipleIDs(urlSearchParamsTx);
     }
-    console.log("pathname is ", pathname);
   }
+}
+
+function splitToMultipleIDs(strIn: string): string[] {
+  let components = strIn.split(',');
+  return components.map(function(component) {return component.trim();});
 }
 
 //TODO: May need to rethink how this works while still avoiding issues with BigNumbers only handling integer values. Maybe inverse?
