@@ -211,7 +211,7 @@ function checkURLForTxIDs(): string[] | undefined {
 
 function splitToMultipleIDs(strIn: string): string[] {
   let components = strIn.split(',');
-  return components.map(function(component) {return component.trim();});
+  return components.map(function(component) {return decodeURIComponent(component).trim();});
 }
 
 //TODO: May need to rethink how this works while still avoiding issues with BigNumbers only handling integer values. Maybe inverse?
