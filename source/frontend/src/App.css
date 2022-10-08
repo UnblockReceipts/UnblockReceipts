@@ -8,12 +8,6 @@
   font-family: "Manrope", sans-serif;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
 .App-header {
   background: linear-gradient(
     to left bottom,
@@ -50,8 +44,4 @@
   to {
     transform: rotate(360deg);
   }
-}
-
-#receipt {
-  display: none;
 }
