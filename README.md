@@ -9,3 +9,5 @@ However, expense reporting does have important purposes, for example in helping 
 UnblockReceipts solves this conundrum by using software to automate the paperwork burden.  Business leaders and tax authorities can get all the benefits of accurate expense reporting, while also saving the business staff time spent on filling out those expense reports and enabling specialists to more rapidly explore the business opportunities in this new web3 world.
 
 UnblockReceipts is a simple service that, given a transaction identifier (hash), generates a traditional receipt for a transaction fee paid on a selected EVM-compatible chain.  The receipt shows the amount of the transaction fee in the native token (ETH, MATIC, or equivalent) and pulls data from an oracle source or centralized exchange (initially, the same for all users) about the USD exchange value of that token as of the block timestamp.
+
+For information about how to run this application locally, check out the relevant documentation [here](docs/howToRun.md).
