@@ -1,0 +1,24 @@
+{
+  "name": "nodedatarelay",
+  "version": "0.0.1",
+  "description": "A relayer to protect Coinbase Node API keys.",
+  "main": "startExpressServer.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/UnblockReceipts/UnblockReceipts.git"
+  },
+  "author": "",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/UnblockReceipts/UnblockReceipts/issues"
+  },
+  "homepage": "https://github.com/UnblockReceipts/UnblockReceipts#readme",
+  "dependencies": {
+    "ethers": "^5.7.1",
+    "express": "^4.18.1",
+    "ts-node": "^10.9.1"
+  }
+}
