@@ -37,6 +37,14 @@
   color: #61dafb;
 }
 
+.txReceiptsTable tbody td {
+  word-wrap: break-word;
+}
+
+.txReceiptsTable tbody tr {
+  border-top: thin black solid;
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
