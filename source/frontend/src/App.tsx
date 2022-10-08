@@ -6,6 +6,7 @@ import './App.css';
 import { ethers } from 'ethers';
 
 interface TxRowData {
+  txID: string;
   gasFeeETHwei: ethers.utils.BigNumber;
   gasFeeUSDCents: ethers.utils.BigNumber;
   timestamp: Date;
@@ -17,6 +18,7 @@ function App() {
   const txID = checkURLForTxID();
   const [txData, setTxData] = useState(function generateEmptyTxData() {
     return {
+      txID: '',
       gasFeeETHwei: new ethers.utils.BigNumber(0),
       gasFeeUSDCents: new ethers.utils.BigNumber(0),
       timestamp: new Date(0),
@@ -49,6 +51,7 @@ function App() {
     const gasFeeUSDCents = gasFeeETHwei.mul(weiPriceInUSDCents);
     console.log('gasPrice', gasPrice, 'gasUsed', gasUsed, 'gasFeeETHwei', gasFeeETHwei);
     const txData =  {
+      txID: txHash,
       value: txn.value,
       gasUsed: receipt.gasUsed,
       //cumulativeGasUsed: receipt.cumulativeGasUsed, //includes txes before the current one in the same block.
