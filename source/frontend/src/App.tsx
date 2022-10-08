@@ -124,14 +124,14 @@ function App() {
               <td>
                 Transaction ID
               </td>
-              <td title="This transaction took place on">
-                Date/Time
-              </td>
               <td>
                 From
               </td>
               <td>
                 To
+              </td>
+              <td title="This transaction took place on">
+                Date/Time
               </td>
               <td>
                 Tx fee (ETH)
@@ -160,9 +160,9 @@ function getTxRow(txData: TxRowData) {
     return (
       <tr className="singleTxReceipt" key={txData.txID}>
         <td><span className="txID">{txData.txID}</span></td>
-        <td>{txData.timestamp.toString()}</td>
         <td>{txData.from}</td>
         <td>{txData.to}</td>
+        <td>{txData.timestamp.toString()}</td>
         <td>{ethers.utils.formatUnits(txData.gasFeeETHwei, 'ether')}</td>
         <td>${parseInt(txData.gasFeeUSDCents.toString())/100}</td>
       </tr>
