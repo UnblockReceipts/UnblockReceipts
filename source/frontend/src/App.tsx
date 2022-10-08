@@ -8,6 +8,7 @@ function App() {
   const [txData, setTxData] = useState(function generateEmptyTxData() {
     return {
       gasFeeETHwei: new ethers.utils.BigNumber(0),
+      gasFeeUSDCents: new ethers.utils.BigNumber(0),
     }
   });
   console.log('txHash:',txID);
@@ -23,10 +24,12 @@ function App() {
     });
     const receipt = await provider.getTransactionReceipt(txHash);
     const txn = await provider.getTransaction(txHash);
+    const weiPriceInUSDCents = await getWeiPriceInUSDCents(receipt.blockNumber);
     //@ts-ignore that effectiveGasPrice might be undefined - it's undocumented but sometimes there.
     const gasPrice = (typeof receipt.effectiveGasPrice === 'undefined') ? txn.gasPrice : receipt.effectiveGasPrice;
     const gasUsed = (typeof receipt.gasUsed === 'undefined') ? new ethers.utils.BigNumber(0) : receipt.gasUsed;
     const gasFeeETHwei = gasUsed.mul(gasPrice);
+    const gasFeeUSDCents = gasFeeETHwei.mul(weiPriceInUSDCents);
     console.log('gasPrice', gasPrice, 'gasUsed', gasUsed, 'gasFeeETHwei', gasFeeETHwei);
     const txData =  {
       value: txn.value,
@@ -35,6 +38,7 @@ function App() {
       gasPriceString: txn.gasPrice.toString(),
       gasLimit: txn.gasLimit,
       gasFeeETHwei,
+      gasFeeUSDCents,
     };
     console.log('txData:',txData);
     setTxData(txData);
@@ -58,6 +62,7 @@ function App() {
       <div className="singleTxReceipt">
         You are viewing a receipt for tx <span className="txID">{txID}</span>.
         <p> Gas fee: {ethers.utils.formatUnits(txData.gasFeeETHwei, 'ether')} ETH </p>
+        <p> Gas fee: {parseInt(txData.gasFeeUSDCents.toString())/100} USD </p>
       </div>
     );
   }
@@ -82,6 +87,10 @@ function checkURLForTxID() : string | undefined {
     }
     console.log('pathname is ',pathname);
   }
+}
+
+async function getWeiPriceInUSDCents(blockNumber : number | undefined) : Promise<ethers.utils.BigNumberish> {
+  return 1; //temporary placeholder
 }
 
 export default App;
