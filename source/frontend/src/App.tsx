@@ -23,8 +23,8 @@ function App() {
       const { ethers } = require('ethers');
       const provider = new ethers.providers.JsonRpcProvider({
         url: 'https://mainnet.ethereum.coinbasecloud.net',
-        user: 'WR5CGFRJSKSID364W4CW',
-        password: '5MQCC4HB5X7RXNPDODB6SBWREAEK2LLKKDBVUIHI',
+        user: process.env.REACT_APP_COINBASE_CLOUD_USER,
+        password: process.env.REACT_APP_COINBASE_CLOUD_PASS,
       });
       const receipt = await provider.getTransactionReceipt(txHash);
       const txn = await provider.getTransaction(txHash);
