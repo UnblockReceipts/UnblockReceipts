@@ -28,6 +28,11 @@ function App() {
       });
       const receipt = await provider.getTransactionReceipt(txHash);
       const txn = await provider.getTransaction(txHash);
+      //@ts-ignore that effectiveGasPrice might be undefined - it's undocumented but sometimes there.
+      const gasPrice = (typeof receipt.effectiveGasPrice === 'undefined') ? txn.gasPrice : receipt.effectiveGasPrice;
+      const gasUsed = (typeof receipt.gasUsed === 'undefined') ? new ethers.utils.BigNumber(0) : receipt.gasUsed;
+      const gasFeeETHwei = gasUsed.mul(gasPrice);
+      console.log('gasPrice', gasPrice, 'gasUsed', gasUsed, 'gasFeeETHwei', gasFeeETHwei);
       const txData =  {
         value: txn.value,
         gasUsed: receipt.gasUsed,
