@@ -113,6 +113,11 @@ function App() {
       </>
     );
   } else {
+    return getTxRow(txData);
+  }
+}
+
+function getTxRow(txData: TxRowData) {
     return (
       <div className="singleTxReceipt">
         You are viewing a receipt for tx <span className="txID">{txData.txID}</span>.
@@ -123,7 +128,6 @@ function App() {
         <p> Gas fee: {parseInt(txData.gasFeeUSDCents.toString())/100} USD </p>
       </div>
     );
-  }
 }
 
 function checkURLForTxID(): string | undefined {
