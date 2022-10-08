@@ -5,6 +5,14 @@ import unblockReceiptLogo from "./images/unblockReceiptLogo.png";
 import './App.css';
 import { ethers } from 'ethers';
 
+interface TxRowData {
+  gasFeeETHwei: ethers.utils.BigNumber;
+  gasFeeUSDCents: ethers.utils.BigNumber;
+  timestamp: Date;
+  from: string | undefined;
+  to: string | undefined;
+}
+
 function App() {
   const txID = checkURLForTxID();
   const [txData, setTxData] = useState(function generateEmptyTxData() {
@@ -12,9 +20,9 @@ function App() {
       gasFeeETHwei: new ethers.utils.BigNumber(0),
       gasFeeUSDCents: new ethers.utils.BigNumber(0),
       timestamp: new Date(0),
-      from: '' as string | undefined,
-      to: '' as string | undefined,
-    }
+      from: '',
+      to: '',
+    } as TxRowData;
   });
   console.log('txHash:',txID);
   //Example txn to use: 0x60286c0fee3a46697e3ea4b04bc229f5db4b65d001d93563351fb66d81bf06b2
