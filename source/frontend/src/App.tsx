@@ -108,6 +108,7 @@ function App() {
   } else {
     return (
       <>
+        <span className="slogan">Spend your tokens, not your time</span>
         <h1>
           Decentralized network transaction receipt
         </h1>
