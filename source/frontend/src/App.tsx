@@ -46,7 +46,7 @@ function App() {
     const gasFeeUSDCents = gasFeeETHwei.mul(weiPriceInUSDCents);
     const valueUSDCents = txn.value.mul(weiPriceInUSDCents);
     console.log('gasPrice', gasPrice, 'gasUsed', gasUsed, 'gasFeeETHwei', gasFeeETHwei);
-    const txData = [{
+    const txData = {
       txID: txHash,
       value: txn.value,
       valueUSDCents,
@@ -59,12 +59,23 @@ function App() {
       timestamp: new Date(block.timestamp*1000),
       to: receipt.to,
       from: receipt.from,
-    }];
+    };
+    return txData;
+  }
+  const getTxnsData = async function(txHashes: string[] | undefined) {
+    if(typeof txHashes === 'undefined') {
+      return;
+    }
+    const txDataPromises : Promise<TxRowData>[] = [];
+    for(let txHash of txHashes) {
+      txDataPromises.push(getTxnData(txHash));
+    }
+    const txData = await Promise.all(txDataPromises);
     console.log('txData:',txData);
     setTxData(txData);
     return txData;
   }
-  useEffect(() => { getTxnData(txID); },[]); //https://stackoverflow.com/a/71434389/
+  useEffect(() => { getTxnsData(txID); },[]); //https://stackoverflow.com/a/71434389/
   if(typeof txID === 'undefined') {
     return (
       <>
@@ -181,7 +192,7 @@ function getTxRow(txData: TxRowData) {
     );
 }
 
-function checkURLForTxID(): string | undefined {
+function checkURLForTxID(): string[] | undefined {
   const pathname = window.location.pathname;
   const SINGLE_TX_START = "/tx/";
   if (pathname.startsWith(SINGLE_TX_START)) {
@@ -191,14 +202,19 @@ function checkURLForTxID(): string | undefined {
       txHashEndsBefore = txHashEndSlash;
     }
     const txHash = pathname.substring(SINGLE_TX_START.length, txHashEndsBefore);
-    return txHash;
+    return splitToMultipleIDs(txHash);
   } else {
     const urlSearchParams = new URLSearchParams(window.location.search);
     const urlSearchParamsTx = urlSearchParams.get("tx");
     if (urlSearchParamsTx !== null) {
-      return urlSearchParamsTx;
+      return splitToMultipleIDs(urlSearchParamsTx);
     }
   }
+}
+
+function splitToMultipleIDs(strIn: string): string[] {
+  let components = strIn.split(',');
+  return components.map(function(component) {return component.trim();});
 }
 
 //TODO: May need to rethink how this works while still avoiding issues with BigNumbers only handling integer values. Maybe inverse?
