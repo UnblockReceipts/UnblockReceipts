@@ -121,24 +121,24 @@ function App() {
         <table className="txReceiptsTable">
           <thead>
             <tr>
-            <td>
-              Transaction ID
-            </td>
-            <td title="This transaction took place on">
-              Date/Time
-            </td>
-            <td>
-              From
-            </td>
-            <td>
-              To
-            </td>
-            <td>
-              Tx fee (ETH)
-            </td>
-            <td>
-              Tx fee (USD)
-            </td>
+              <td>
+                Transaction ID
+              </td>
+              <td title="This transaction took place on">
+                Date/Time
+              </td>
+              <td>
+                From
+              </td>
+              <td>
+                To
+              </td>
+              <td>
+                Tx fee (ETH)
+              </td>
+              <td>
+                Tx fee (USD)
+              </td>
             </tr>
           </thead>
         <tbody>
