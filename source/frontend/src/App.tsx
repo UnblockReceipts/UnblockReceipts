@@ -4,6 +4,7 @@ import './App.css';
 
 function App() {
   const txID = checkURLForTxID();
+  console.log('txHash:',txID);
   return (
     <div className="App">
       <header className="App-header">
@@ -34,7 +35,6 @@ function checkURLForTxID() : string | undefined {
       txHashEndsBefore = txHashEndSlash;
     }
     const txHash = pathname.substring(SINGLE_TX_START.length, txHashEndsBefore);
-    console.log('txHash:',txHash);
     return txHash;
   } else {
     console.log('pathname is ',pathname);
