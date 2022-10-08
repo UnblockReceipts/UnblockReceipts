@@ -1,6 +1,7 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
+import { ethers } from 'ethers';
 
 function App() {
   const txID = checkURLForTxID();
@@ -20,7 +21,6 @@ function App() {
   } else {
     //Example txn to use: 0x60286c0fee3a46697e3ea4b04bc229f5db4b65d001d93563351fb66d81bf06b2
     const getTxnData = async function(txHash: string) {
-      const { ethers } = require('ethers');
       const provider = new ethers.providers.JsonRpcProvider({
         url: 'https://mainnet.ethereum.coinbasecloud.net',
         user: process.env.REACT_APP_COINBASE_CLOUD_USER,
