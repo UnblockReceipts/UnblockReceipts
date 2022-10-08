@@ -3,6 +3,7 @@ import logo from './logo.svg';
 import './App.css';
 
 function App() {
+  const txID = checkURLForTxID();
   return (
     <div className="App">
       <header className="App-header">
@@ -21,6 +22,23 @@ function App() {
       </header>
     </div>
   );
+}
+
+function checkURLForTxID() : string | undefined {
+  const pathname = window.location.pathname;
+  const SINGLE_TX_START = '/tx/';
+  if(pathname.startsWith(SINGLE_TX_START)) {
+    let txHashEndSlash = pathname.indexOf('/', SINGLE_TX_START.length);
+    let txHashEndsBefore = pathname.length;
+    if(txHashEndSlash >= 0) {
+      txHashEndsBefore = txHashEndSlash;
+    }
+    const txHash = pathname.substring(SINGLE_TX_START.length, txHashEndsBefore);
+    console.log('txHash:',txHash);
+    return txHash;
+  } else {
+    console.log('pathname is ',pathname);
+  }
 }
 
 export default App;
