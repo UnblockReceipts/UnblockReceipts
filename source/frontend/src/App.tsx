@@ -133,6 +133,7 @@ function App() {
   } else {
     return (
       <>
+        {/*<Navbar />*/}
         <img
             src={unblockReceiptLogo}
             className="App-logo"
