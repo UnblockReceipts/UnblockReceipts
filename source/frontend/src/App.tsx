@@ -107,11 +107,13 @@ function App() {
     );
   } else {
     return (
+      <>
       <div>
         {
           txData.map(getTxRow)
         }
       </div>
+      </>
     );
   }
 }
