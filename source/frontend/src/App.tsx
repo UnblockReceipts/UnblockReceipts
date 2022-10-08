@@ -108,12 +108,19 @@ function App() {
   } else {
     return (
       <>
+        <img
+            src={unblockReceiptLogo}
+            className="App-logo"
+            alt="logo"
+            style={{ height: "180px", paddingBottom: "1rem" }}
+        />
         <span className="slogan">Spend your tokens, not your time</span>
         <h1>
           Decentralized network transaction receipt
         </h1>
         <table className="txReceiptsTable">
           <thead>
+            <tr>
             <td>
               Transaction ID
             </td>
@@ -132,6 +139,7 @@ function App() {
             <td>
               Tx fee (USD)
             </td>
+            </tr>
           </thead>
         <tbody>
           {
