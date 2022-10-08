@@ -12,6 +12,8 @@ function App() {
       gasFeeETHwei: new ethers.utils.BigNumber(0),
       gasFeeUSDCents: new ethers.utils.BigNumber(0),
       timestamp: new Date(0),
+      from: '' as string | undefined,
+      to: '' as string | undefined,
     }
   });
   console.log('txHash:',txID);
@@ -47,6 +49,8 @@ function App() {
       gasFeeETHwei,
       gasFeeUSDCents,
       timestamp: new Date(block.timestamp*1000),
+      to: receipt.to,
+      from: receipt.from,
     };
     console.log('txData:',txData);
     setTxData(txData);
@@ -102,6 +106,8 @@ function App() {
       <div className="singleTxReceipt">
         You are viewing a receipt for tx <span className="txID">{txID}</span>.
         <p> This transaction took place on {txData.timestamp.toString()}.</p>
+        <p> From: {txData.from}</p>
+        <p> To: {txData.to}</p>
         <p> Gas fee: {ethers.utils.formatUnits(txData.gasFeeETHwei, 'ether')} ETH </p>
         <p> Gas fee: {parseInt(txData.gasFeeUSDCents.toString())/100} USD </p>
       </div>
