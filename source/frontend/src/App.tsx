@@ -17,11 +17,11 @@ interface TxRowData {
 }
 
 function App() {
-  const txID = checkURLForTxID();
+  const txIDs = checkURLForTxID();
   const [txData, setTxData] = useState(function generateEmptyTxData() {
     return [] as TxRowData[];
   });
-  console.log('txHash:',txID);
+  console.log('txHash:',txIDs);
   //Example txn to use: 0x60286c0fee3a46697e3ea4b04bc229f5db4b65d001d93563351fb66d81bf06b2
   const getTxnData = async function(txHash: string) {
     const provider = new ethers.providers.JsonRpcProvider({
@@ -72,8 +72,8 @@ function App() {
     setTxData(txData);
     return txData;
   }
-  useEffect(() => { getTxnsData(txID); },[]); //https://stackoverflow.com/a/71434389/
-  if(typeof txID === 'undefined') {
+  useEffect(() => { getTxnsData(txIDs); },[]); //https://stackoverflow.com/a/71434389/
+  if(typeof txIDs === 'undefined') {
     return (
       <>
       <Navbar />
