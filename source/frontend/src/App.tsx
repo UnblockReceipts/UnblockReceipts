@@ -37,12 +37,12 @@ function checkURLForTxID() : string | undefined {
     const txHash = pathname.substring(SINGLE_TX_START.length, txHashEndsBefore);
     return txHash;
   } else {
-    console.log('pathname is ',pathname);
     const urlSearchParams = new URLSearchParams(window.location.search);
     const urlSearchParamsTx = urlSearchParams.get('tx');
     if(urlSearchParamsTx !== null) {
       return urlSearchParamsTx;
     }
+    console.log('pathname is ',pathname);
   }
 }
 
