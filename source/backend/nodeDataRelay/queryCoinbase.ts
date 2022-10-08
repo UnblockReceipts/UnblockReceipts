@@ -8,8 +8,8 @@ async function getFormattedETHBalance() {
 		user: 'WR5CGFRJSKSID364W4CW',
 		password: '5MQCC4HB5X7RXNPDODB6SBWREAEK2LLKKDBVUIHI',
 	});
-	const balance = await provider.getBalance('0xc94770007dda54cF92009BFF0dE90c06F603a09f')
-	const balanceFormatted = ethers.utils.formatEther(balance)
+	const balance = await provider.getBalance('0xc94770007dda54cF92009BFF0dE90c06F603a09f');
+	const balanceFormatted = ethers.utils.formatEther(balance);
 	return balanceFormatted;
 }
 getFormattedETHBalance().then(function(formattedBalance) {
