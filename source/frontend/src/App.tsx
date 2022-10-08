@@ -17,7 +17,7 @@ interface TxRowData {
 }
 
 function App() {
-  const txIDs = checkURLForTxID();
+  const txIDs = checkURLForTxIDs();
   const [txData, setTxData] = useState(function generateEmptyTxData() {
     return [] as TxRowData[];
   });
@@ -189,7 +189,7 @@ function getTxRow(txData: TxRowData) {
     );
 }
 
-function checkURLForTxID(): string[] | undefined {
+function checkURLForTxIDs(): string[] | undefined {
   const pathname = window.location.pathname;
   const SINGLE_TX_START = "/tx/";
   if (pathname.startsWith(SINGLE_TX_START)) {
