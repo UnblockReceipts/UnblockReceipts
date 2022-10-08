@@ -57,7 +57,7 @@ function App() {
     return (
       <div className="singleTxReceipt">
         You are viewing a receipt for tx <span className="txID">{txID}</span>.
-        <p> Gas fee: {txData.gasFeeETHwei.toString()} wei </p>
+        <p> Gas fee: {ethers.utils.formatUnits(txData.gasFeeETHwei, 'ether')} ETH </p>
       </div>
     );
   }
