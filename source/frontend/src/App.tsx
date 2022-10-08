@@ -11,36 +11,36 @@ function App() {
     }
   });
   console.log('txHash:',txID);
-    //Example txn to use: 0x60286c0fee3a46697e3ea4b04bc229f5db4b65d001d93563351fb66d81bf06b2
-    const getTxnData = async function(txHash: string | undefined) {
-      if(typeof txHash === 'undefined') {
-        return;
-      }
-      const provider = new ethers.providers.JsonRpcProvider({
-        url: 'https://mainnet.ethereum.coinbasecloud.net',
-        user: process.env.REACT_APP_COINBASE_CLOUD_USER,
-        password: process.env.REACT_APP_COINBASE_CLOUD_PASS,
-      });
-      const receipt = await provider.getTransactionReceipt(txHash);
-      const txn = await provider.getTransaction(txHash);
-      //@ts-ignore that effectiveGasPrice might be undefined - it's undocumented but sometimes there.
-      const gasPrice = (typeof receipt.effectiveGasPrice === 'undefined') ? txn.gasPrice : receipt.effectiveGasPrice;
-      const gasUsed = (typeof receipt.gasUsed === 'undefined') ? new ethers.utils.BigNumber(0) : receipt.gasUsed;
-      const gasFeeETHwei = gasUsed.mul(gasPrice);
-      console.log('gasPrice', gasPrice, 'gasUsed', gasUsed, 'gasFeeETHwei', gasFeeETHwei);
-      const txData =  {
-        value: txn.value,
-        gasUsed: receipt.gasUsed,
-        //cumulativeGasUsed: receipt.cumulativeGasUsed, //includes txes before the current one in the same block.
-        gasPriceString: txn.gasPrice.toString(),
-        gasLimit: txn.gasLimit,
-        gasFeeETHwei,
-      };
-      console.log('txData:',txData);
-      setTxData(txData);
-      return txData;
+  //Example txn to use: 0x60286c0fee3a46697e3ea4b04bc229f5db4b65d001d93563351fb66d81bf06b2
+  const getTxnData = async function(txHash: string | undefined) {
+    if(typeof txHash === 'undefined') {
+      return;
     }
-    useEffect(() => { getTxnData(txID); },[]); //https://stackoverflow.com/a/71434389/
+    const provider = new ethers.providers.JsonRpcProvider({
+      url: 'https://mainnet.ethereum.coinbasecloud.net',
+      user: process.env.REACT_APP_COINBASE_CLOUD_USER,
+      password: process.env.REACT_APP_COINBASE_CLOUD_PASS,
+    });
+    const receipt = await provider.getTransactionReceipt(txHash);
+    const txn = await provider.getTransaction(txHash);
+    //@ts-ignore that effectiveGasPrice might be undefined - it's undocumented but sometimes there.
+    const gasPrice = (typeof receipt.effectiveGasPrice === 'undefined') ? txn.gasPrice : receipt.effectiveGasPrice;
+    const gasUsed = (typeof receipt.gasUsed === 'undefined') ? new ethers.utils.BigNumber(0) : receipt.gasUsed;
+    const gasFeeETHwei = gasUsed.mul(gasPrice);
+    console.log('gasPrice', gasPrice, 'gasUsed', gasUsed, 'gasFeeETHwei', gasFeeETHwei);
+    const txData =  {
+      value: txn.value,
+      gasUsed: receipt.gasUsed,
+      //cumulativeGasUsed: receipt.cumulativeGasUsed, //includes txes before the current one in the same block.
+      gasPriceString: txn.gasPrice.toString(),
+      gasLimit: txn.gasLimit,
+      gasFeeETHwei,
+    };
+    console.log('txData:',txData);
+    setTxData(txData);
+    return txData;
+  }
+  useEffect(() => { getTxnData(txID); },[]); //https://stackoverflow.com/a/71434389/
   if(typeof txID === 'undefined') {
     return (
       <div className="App">
