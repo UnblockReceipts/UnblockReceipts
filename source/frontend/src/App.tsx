@@ -1,10 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import { ethers } from 'ethers';
 
 function App() {
   const txID = checkURLForTxID();
+  const [txData, setTxData] = useState(function generateEmptyTxData() {
+    return {
+      gasFeeETHwei: new ethers.utils.BigNumber(0),
+    }
+  });
   console.log('txHash:',txID);
   if(typeof txID === 'undefined') {
     return (
@@ -37,16 +42,18 @@ function App() {
         value: txn.value,
         gasUsed: receipt.gasUsed,
         //cumulativeGasUsed: receipt.cumulativeGasUsed, //includes txes before the current one in the same block.
-        effectiveGasPrice: receipt.effectiveGasPrice,
-        gasPrice: txn.gasPrice,
+        gasPriceString: txn.gasPrice.toString(),
         gasLimit: txn.gasLimit,
+        gasFeeETHwei,
       };
-      console.log(txData);
+      console.log('txData: '+txData);
+      setTxData(txData);
       return txData;
     }
     getTxnData(txID);
     return (
       <div className="singleTxReceipt">
+        <p> Gas fee: {txData.gasFeeETHwei.toString()} wei </p>
         You are viewing a receipt for tx <span className="txID">{txID}</span>
       </div>
     );
