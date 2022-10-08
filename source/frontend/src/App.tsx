@@ -5,6 +5,7 @@ import './App.css';
 function App() {
   const txID = checkURLForTxID();
   console.log('txHash:',txID);
+  if(typeof txID === 'undefined') {
   return (
     <div className="App">
       <header className="App-header">
@@ -23,6 +24,13 @@ function App() {
       </header>
     </div>
   );
+  } else {
+    return (
+      <div className="singleTxReceipt">
+        You are viewing a receipt for tx <span className="txID">{txID}</span>
+      </div>
+    );
+  }
 }
 
 function checkURLForTxID() : string | undefined {
