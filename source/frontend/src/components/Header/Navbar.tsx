@@ -24,6 +24,9 @@ export default function Navbar() {
               style={{ paddingTop: ".5rem", height: "40px" }}
             />
           </Typography>
+          <div style={{marginRight: '0', fontStyle: 'italic'}}>
+            Spend your tokens, not your time
+          </div>
         </Toolbar>
       </AppBar>
     </Box>
