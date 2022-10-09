@@ -248,7 +248,21 @@ function checkURLForTxIDs(): string[] | undefined {
     const urlSearchParamsTx = urlSearchParams.get("tx");
     if (urlSearchParamsTx !== null) {
       return splitToMultipleIDs(urlSearchParamsTx);
-    }
+async function getAllTxDataAboutAddress(address: string, blockStart: string = 'genesis', blockEnd: string = 'latest') : Promise<string[]> {
+  let result: string[] = [];
+  //TODO: Handle pagination
+  const singleCallResult = await makeHTTPRequestToCoinbaseCloud({
+    address,
+    blockStart,
+    blockEnd, //see pagination
+    "addressFilter": "SENDER_ONLY", //can also be "SENDER_OR_RECEIVER" or "RECEIVER_ONLY"
+    "blockchain": "Ethereum", //currently the only option; "Polygon" and "Optimism" and "Arbitrum" to be added.
+    "network": "Mainnet" //"Goerli" also supported
+  });
+  console.log('Coinbase call result: ',singleCallResult);
+  //Empty array for now.
+  return result;
+}
 
 function makeHTTPRequestToCoinbaseCloud(
   params: paramsForTxByAddress,
