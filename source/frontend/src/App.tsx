@@ -318,7 +318,7 @@ function checkURLForTxIDs(): string[] | undefined {
   }
 }
 
-async function convertAddressesToTxList(addresses: string[], blockStart: string = 'genesis', blockEnd: string = 'latest') : Promise<string[]> {
+async function convertAddressesToTxList(addresses: string[], blockStart: string = 'genesis', blockEnd: string = 'latest') : Promise<BlockTransaction[]> {
   let result = [];
   for(let address of addresses) {
     result.push(...(await getAllTxDataAboutAddress(address, blockStart, blockEnd)));
@@ -326,12 +326,10 @@ async function convertAddressesToTxList(addresses: string[], blockStart: string 
   return result;
 }
 
-async function getAllTxDataAboutAddress(address: string, blockStart: string = 'genesis', blockEnd: string = 'latest') : Promise<string[]> {
-  let result: string[] = [];
+async function getAllTxDataAboutAddress(address: string, blockStart: string = 'genesis', blockEnd: string = 'latest', resultBlockSet: BlockTransaction[] = []) : Promise<BlockTransaction[]> {
   if(blockStart === 'genesis') {
     blockStart = '0x0'; //'genesis' is not accepted.
   }
-  //TODO: Handle pagination
   const singleCallResult = await makeHTTPRequestToCoinbaseCloud({
     address,
     blockStart,
@@ -339,10 +337,21 @@ async function getAllTxDataAboutAddress(address: string, blockStart: string = 'g
     "addressFilter": "SENDER_ONLY", //can also be "SENDER_OR_RECEIVER" or "RECEIVER_ONLY"
     "blockchain": "Ethereum", //currently the only option; "Polygon" and "Optimism" and "Arbitrum" to be added.
     "network": "Mainnet" //"Goerli" also supported
-  });
+  }) as TransactionsByAddressResult;
   console.log('Coinbase call result: ',singleCallResult);
-  //Empty array for now.
-  return result;
+  resultBlockSet.push(...singleCallResult.result.blocks);
+  //Pagination handling:
+  let requestedBlockStart = ethers.BigNumber.from(blockStart);
+  let actualBlockStartHex = singleCallResult?.result?.blockStart;
+  if(typeof actualBlockStartHex === 'undefined') {
+    console.warn('Could not determine if additional pagination queries are needed; not making them.');
+  } else {
+    let actualBlockStart = ethers.BigNumber.from(actualBlockStartHex);
+    if(actualBlockStart.gt(requestedBlockStart)) {
+      return getAllTxDataAboutAddress(address, blockStart, actualBlockStart.sub(1).toHexString(), resultBlockSet)
+    }
+  }
+  return resultBlockSet;
 }
 
 function makeHTTPRequestToCoinbaseCloud(
