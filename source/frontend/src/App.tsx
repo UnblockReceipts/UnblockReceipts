@@ -5,7 +5,7 @@ import unblockReceiptLogoTight from "./images/unblockReceiptLogoTight.png";
 import './App.css';
 import { ethers } from 'ethers';
 
-import { ConnectButton, useConnectModal } from '@web3modal/react'
+import { ConnectButton, useConnectModal, useAccount } from '@web3modal/react'
 
 type MODE = 'tx' | 'acct';
 
@@ -102,6 +102,7 @@ interface TxRowData {
 
 function App() {
   const { isOpen, open, close } = useConnectModal()
+  const { address, isConnected } = useAccount()
   const receiptQuery = checkURLForTxIDs();
   const [txData, setTxData] = useState(function generateEmptyTxData() {
     return [] as TxRowData[];
@@ -201,6 +202,7 @@ function App() {
             <input
               id="acctInput"
               placeholder="e.g. 0x0dc58008C371b240bAEE63Cb9D514C99d5e96c9A"
+              value={address}
               />
             <button
               onClick={(ev: React.MouseEvent) => {
@@ -208,7 +210,7 @@ function App() {
                 if(!(inputElement instanceof HTMLInputElement)) {
                   throw new Error('acctInput element was not of the expected type - this should never happen.');
                 }
-                const inputValue = inputElement.value;
+                const inputValue = address;
                 if(membersMatchExpectedLength(inputValue, 42)) {
                   window.location.pathname = '/acct/' + inputValue;
                 }
