@@ -348,7 +348,7 @@ async function getTxDataForAddresses(
   const blockTransactions = await convertAddressesToTxList(addresses, blockStart, blockEnd);
   let result: TxRowData[] = [];
   for(let blockTransaction of blockTransactions) {
-    const timestamp = new Date(blockTransaction.blockTimestamp);
+    const timestamp = new Date(parseInt(blockTransaction.blockTimestamp, 16)*1000);
     const blockNumber = parseInt(blockTransaction.blockNumber);
     for(let txn of blockTransaction.transactions) {
       const weiPriceInUSDCents = await getWeiPriceInUSDCents(blockNumber);
