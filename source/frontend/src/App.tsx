@@ -15,6 +15,11 @@ interface DataForDisplay {
   TxRows: TxRowData[];
 }
 
+interface WrappedTxData {
+  startBlockTimestamp?: Date,
+  endBlockTimestamp?: Date,
+  txData: TxRowData[]
+}
 interface ReceiptQuery {
   addresses: string[];
   txHashes: string[];
@@ -108,8 +113,10 @@ const dater = new EthDater(new ethers.providers.CloudflareProvider());
 function App() {
   const { isOpen, open, close } = useConnectModal();
   const receiptQuery = getReceiptQueryFromURL();
-  const [txData, setTxData] = useState(function generateEmptyTxData() {
-    return [] as TxRowData[];
+  const [wrappedTxData, setTxData] = useState(function generateEmptyTxData() {
+    return {txData: [] as TxRowData[],
+      startBlockTimestamp: undefined,
+      endBlockTimestamp: undefined} as WrappedTxData
   });
   const getTxnData = async function(txHash: string) : Promise<TxRowData> {
     const provider = getCoinbaseNodeProvider();
@@ -143,14 +150,14 @@ function App() {
     };
     return txData;
   }
-  const getTxnsData = async function(receiptQuery: ReceiptQuery) : Promise<TxRowData[]> {
+  const getTxnsData = async function(receiptQuery: ReceiptQuery) : Promise<WrappedTxData> {
     const txHashes = receiptQuery.txHashes;
     if(txHashes.length > 0){
       const txDataPromises : Promise<TxRowData>[] = [];
       for(let txHash of txHashes) {
         txDataPromises.push(getTxnData(txHash));
       }
-      return await Promise.all(txDataPromises);
+      return {txData: await Promise.all(txDataPromises), startBlockTimestamp: undefined, endBlockTimestamp: undefined};
     } else {
       if(typeof receiptQuery.blockStart === 'undefined' && typeof receiptQuery.msStart !== 'undefined') {
         receiptQuery.blockStart = await getHexBlockNumberJustBeforeTimestamp(receiptQuery.msStart);
@@ -158,18 +165,32 @@ function App() {
       if(typeof receiptQuery.blockEnd === 'undefined' && typeof receiptQuery.msEnd !== 'undefined') {
         receiptQuery.blockEnd = await getHexBlockNumberJustBeforeTimestamp(receiptQuery.msEnd);
       }
+      let startBlockTimestamp = undefined;
+      let endBlockTimestamp = undefined;
+      if(typeof receiptQuery.blockStart !== 'undefined' || typeof receiptQuery.blockEnd !== 'undefined') {
+        const provider = getCoinbaseNodeProvider();
+        if(typeof receiptQuery.blockStart !== 'undefined') {
+          const block = await provider.getBlock(receiptQuery.blockStart);
+          startBlockTimestamp = new Date(block.timestamp);
+        }
+        if(typeof receiptQuery.blockEnd !== 'undefined') {
+          const block = await provider.getBlock(receiptQuery.blockEnd);
+          endBlockTimestamp = new Date(block.timestamp);
+        }
+      }
       //get address data; TODO make these not mutually exclusive.
-      return getTxDataForAddresses(receiptQuery.addresses, receiptQuery.blockStart, receiptQuery.blockEnd);
+      return {startBlockTimestamp, endBlockTimestamp, txData: await getTxDataForAddresses(receiptQuery.addresses, receiptQuery.blockStart, receiptQuery.blockEnd)};
     }
   }
   const getAndDisplayTxnsData = async function(receiptQuery: ReceiptQuery | undefined) {
     if(typeof receiptQuery === 'undefined') {
       return;
     }
-    const txData = await getTxnsData(receiptQuery);
-    console.log('txData:',txData);
-    setTxData(txData);
-    return txData;
+    let wrappedTxData = undefined;
+    wrappedTxData= await getTxnsData(receiptQuery);
+    console.log('wrappedTxData:',wrappedTxData);
+    setTxData(wrappedTxData);
+    return wrappedTxData;
   }
   useEffect(() => { getAndDisplayTxnsData(receiptQuery); },[]); //https://stackoverflow.com/a/71434389/
   if(typeof receiptQuery === 'undefined') {
@@ -262,7 +283,7 @@ function App() {
           (receiptQuery.addresses.length === 1 ? ' a specified account' : ' specified accounts')
           )}.
         </p>
-        {txData.length > 0 ? '' :
+        {wrappedTxData.txData.length > 0 ? '' :
           <p className="mode">Data has not yet finished loading.</p>
         }
         <div className="receiptAndExplanationWrapper">
@@ -297,7 +318,7 @@ function App() {
             </thead>
             <tbody>
               {
-                txData.map(getTxRow)
+                wrappedTxData.txData.map(getTxRow)
               }
             </tbody>
           </table>
