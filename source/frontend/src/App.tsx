@@ -14,6 +14,11 @@ interface DataForDisplay {
   TxRows: TxRowData[];
 }
 
+interface ReceiptQuery {
+  addresses: string[];
+  txHashes: string[];
+}
+
 interface TokenTransfer {
   //https://docs.cloud.coinbase.com/node/reference/advanced-api-reference#tokentransfer
   tokenAddress: string;
@@ -95,7 +100,7 @@ interface TxRowData {
 
 function App() {
   const { isOpen, open, close } = useConnectModal()
-  const txIDs = checkURLForTxIDs();
+  const receiptQuery = checkURLForTxIDs();
   const [txData, setTxData] = useState(function generateEmptyTxData() {
     return [] as TxRowData[];
   });
@@ -131,10 +136,11 @@ function App() {
     };
     return txData;
   }
-  const getTxnsData = async function(txHashes: string[] | undefined) {
-    if(typeof txHashes === 'undefined') {
+  const getTxnsData = async function(receiptQuery: ReceiptQuery | undefined) {
+    if(typeof receiptQuery === 'undefined') {
       return;
     }
+    const txHashes = receiptQuery.txHashes;
     const txDataPromises : Promise<TxRowData>[] = [];
     for(let txHash of txHashes) {
       txDataPromises.push(getTxnData(txHash));
@@ -144,8 +150,8 @@ function App() {
     setTxData(txData);
     return txData;
   }
-  useEffect(() => { getTxnsData(txIDs); },[]); //https://stackoverflow.com/a/71434389/
-  if(typeof txIDs === 'undefined') {
+  useEffect(() => { getTxnsData(receiptQuery); },[]); //https://stackoverflow.com/a/71434389/
+  if(typeof receiptQuery === 'undefined') {
     return (
       <>
       <Navbar />
@@ -294,24 +300,32 @@ function getTxRow(txData: TxRowData) {
     );
 }
 
-function checkURLForTxIDs(): string[] | undefined {
+function checkURLForTxIDs(): ReceiptQuery | undefined {
+  //TODO: This currently ignores addresses if any transactions are defined;
+  //they could technically coexist.
   const pathname = window.location.pathname;
   const SINGLE_TX_START = "/tx/";
   const ADDRESS_START = "/addr/";
   if (pathname.startsWith(SINGLE_TX_START)) {
-    return splitToMultipleIDs(getPathPortionEndingAtOptionalSlash(pathname, SINGLE_TX_START.length));
+    return {
+      txHashes: splitToMultipleIDs(getPathPortionEndingAtOptionalSlash(pathname, SINGLE_TX_START.length)),
+      addresses: [],
+    };
   } else {
     const urlSearchParams = new URLSearchParams(window.location.search);
     const urlSearchParamsTx = urlSearchParams.get("tx");
     const urlSearchParamsAddr = urlSearchParams.get("addr");
     if (urlSearchParamsTx !== null) {
-      return splitToMultipleIDs(urlSearchParamsTx);
+      return {
+        txHashes: splitToMultipleIDs(urlSearchParamsTx),
+        addresses: [],
+      };
     } else if(pathname.startsWith(ADDRESS_START)) {
       const addresses = splitToMultipleIDs(getPathPortionEndingAtOptionalSlash(pathname, ADDRESS_START.length));
-      convertAddressesToTxList(addresses).then(console.log);
+      return {addresses, txHashes: []};
     } else if(urlSearchParamsAddr !== null) {
       const addresses = splitToMultipleIDs(urlSearchParamsAddr);
-      convertAddressesToTxList(addresses).then(console.log);
+      return {addresses, txHashes: []};
     }
   }
 }
