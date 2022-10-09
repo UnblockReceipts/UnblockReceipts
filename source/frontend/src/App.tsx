@@ -354,10 +354,10 @@ function getReceiptQueryFromURL(): ReceiptQuery | undefined {
   const urlSearchParamsMsEnd = urlSearchParams.get("end");
   let partialResult: Partial<ReceiptQuery> = {};
   if(urlSearchParamsBlockStart !== null) {
-    partialResult.blockStart = urlSearchParamsBlockStart;
+    partialResult.blockStart = urlSearchParamsBlockStart.startsWith('0x') ? urlSearchParamsBlockStart : convertToHex(urlSearchParamsBlockStart);
   }
   if(urlSearchParamsBlockEnd !== null) {
-    partialResult.blockEnd = urlSearchParamsBlockEnd;
+    partialResult.blockEnd = urlSearchParamsBlockEnd.startsWith('0x') ? urlSearchParamsBlockEnd : convertToHex(urlSearchParamsBlockEnd);
   }
   if(urlSearchParamsMsStart !== null) {
     partialResult.msStart = new Date(urlSearchParamsMsStart);
@@ -569,6 +569,10 @@ async function getBlockInfoJustBeforeTimestamp(
   timestamp: Date
 ) : Promise<EthDater.BlockResult> {
   return dater.getDate(timestamp, false, false);
+}
+
+function convertToHex(stringNumIn: ethers.BigNumberish) {
+  return ethers.BigNumber.from(stringNumIn).toHexString();
 }
 
 export default App;
