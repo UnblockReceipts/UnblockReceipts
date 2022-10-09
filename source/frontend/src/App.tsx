@@ -404,6 +404,8 @@ async function resolveENSIfNecessary(addressIn: string): Promise<string> {
 async function showAddress(hexAddress: string) : Promise<string> {
   const provider = new ethers.providers.CloudflareProvider();
   const reverseLookup = await provider.lookupAddress(hexAddress);
+  //NOTE: Reverse resolution doesn't always work if the owner doesn't have it configured;
+  //see https://docs.ens.domains/contract-api-reference/reverseregistrar
   if(reverseLookup === null) {
     //console.log('Reverse lookup for ' + hexAddress + ' found no ENS name.');
     return hexAddress;
