@@ -333,15 +333,15 @@ function getReceiptQueryFromURL(): ReceiptQuery | undefined {
   const pathname = window.location.pathname;
   const SINGLE_TX_START = "/tx/";
   const ADDRESS_START = "/acct/";
+  const urlSearchParams = new URLSearchParams(window.location.search);
+  const urlSearchParamsTx = urlSearchParams.get("tx");
+  const urlSearchParamsAddr = urlSearchParams.get("acct");
   if (pathname.startsWith(SINGLE_TX_START)) {
     return {
       txHashes: splitToMultipleIDs(getPathPortionEndingAtOptionalSlash(pathname, SINGLE_TX_START.length)),
       addresses: [],
     };
   } else {
-    const urlSearchParams = new URLSearchParams(window.location.search);
-    const urlSearchParamsTx = urlSearchParams.get("tx");
-    const urlSearchParamsAddr = urlSearchParams.get("acct");
     if (urlSearchParamsTx !== null) {
       return {
         txHashes: splitToMultipleIDs(urlSearchParamsTx),
