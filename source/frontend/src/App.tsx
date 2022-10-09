@@ -171,11 +171,11 @@ function App() {
         const provider = getCoinbaseNodeProvider();
         if(typeof receiptQuery.blockStart !== 'undefined') {
           const block = await provider.getBlock(receiptQuery.blockStart);
-          startBlockTimestamp = new Date(block.timestamp);
+          startBlockTimestamp = new Date(block.timestamp*1000);
         }
         if(typeof receiptQuery.blockEnd !== 'undefined') {
           const block = await provider.getBlock(receiptQuery.blockEnd);
-          endBlockTimestamp = new Date(block.timestamp);
+          endBlockTimestamp = new Date(block.timestamp*1000);
         }
       }
       //get address data; TODO make these not mutually exclusive.
@@ -277,10 +277,12 @@ function App() {
         <p className="mode">
           This is a receipt for
           {receiptQuery.txHashes.length > 0 ?
-          (receiptQuery.txHashes.length === 1 ? ' a specified transaction' : ' specified transactions') :
-          (
-            ' the entire history of ' +
-          (receiptQuery.addresses.length === 1 ? ' a specified account' : ' specified accounts')
+          (receiptQuery.txHashes.length === 1 ? ' a specified transaction' : ' specified transactions') : (
+          (typeof wrappedTxData.startBlockTimestamp === 'undefined' ?
+          (typeof wrappedTxData.endBlockTimestamp === 'undefined' ? (' the entire history ') : (' the entire history until ' + wrappedTxData.endBlockTimestamp)) :
+          (typeof wrappedTxData.endBlockTimestamp === 'undefined' ? (' the history starting from ' + wrappedTxData.startBlockTimestamp) :
+          (' the history from ' + wrappedTxData.startBlockTimestamp + ' through ' + wrappedTxData.endBlockTimestamp))) +
+          ' of'+(receiptQuery.addresses.length === 1 ? ' a specified account' : ' specified accounts')
           )}.
         </p>
         {wrappedTxData.txData.length > 0 ? '' :
