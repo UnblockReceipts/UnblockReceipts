@@ -109,7 +109,7 @@ interface TxRowData {
 }
 
 const dater = new EthDater(new ethers.providers.CloudflareProvider());
-
+const cachedENSResolutions : {[index: string]: string}= {}; //hex address => name
 function App() {
   const { isOpen, open, close } = useConnectModal();
   const { address, isConnected } = useAccount();
@@ -396,11 +396,16 @@ async function resolveENSIfNecessary(addressIn: string): Promise<string> {
   if(resolvedName === null) {
     return addressIn;
   } else {
+    cachedENSResolutions[resolvedName.toLowerCase()] = addressIn;
     return resolvedName;
   }
 }
 
 async function showAddress(hexAddress: string) : Promise<string> {
+  const cacheResult = cachedENSResolutions[hexAddress.toLowerCase()];
+  if(typeof cacheResult !== 'undefined') {
+    return cacheResult;
+  }
   const provider = new ethers.providers.CloudflareProvider();
   const reverseLookup = await provider.lookupAddress(hexAddress);
   //NOTE: Reverse resolution doesn't always work if the owner doesn't have it configured;
