@@ -4,6 +4,7 @@ import unblockReceiptLogo from "./images/unblockReceiptLogo.png";
 import unblockReceiptLogoTight from "./images/unblockReceiptLogoTight.png";
 import './App.css';
 import { ethers } from 'ethers';
+import EthDater from 'ethereum-block-by-date';
 
 import { ConnectButton, useConnectModal, useAccount } from '@web3modal/react'
 
@@ -14,17 +15,24 @@ interface DataForDisplay {
   TxRows: TxRowData[];
 }
 
+interface WrappedTxData {
+  startBlockTimestamp?: Date,
+  endBlockTimestamp?: Date,
+  txData: TxRowData[]
+}
 interface ReceiptQuery {
   addresses: string[];
   txHashes: string[];
   blockStart?: string;
   blockEnd?: string;
+  msStart?: Date;
+  msEnd?: Date;
 }
 
 interface TokenTransfer {
   //https://docs.cloud.coinbase.com/node/reference/advanced-api-reference#tokentransfer
   tokenAddress: string;
-  tokenType:  "erc20" | "erc721";
+  tokenType: "erc20" | "erc721";
   from: string;
   to: string;
   value: string; // For ERC-20, gives quantity of tokens transferred. For ERC-721, gives list of token IDs of the token transferred
@@ -100,12 +108,16 @@ interface TxRowData {
   to: string | undefined;
 }
 
+const dater = new EthDater(new ethers.providers.CloudflareProvider());
+
 function App() {
-  const { isOpen, open, close } = useConnectModal()
-  const { address, isConnected } = useAccount()
-  const receiptQuery = checkURLForTxIDs();
-  const [txData, setTxData] = useState(function generateEmptyTxData() {
-    return [] as TxRowData[];
+  const { isOpen, open, close } = useConnectModal();
+  const { address, isConnected } = useAccount();
+  const receiptQuery = getReceiptQueryFromURL();
+  const [wrappedTxData, setTxData] = useState(function generateEmptyTxData() {
+    return {txData: [] as TxRowData[],
+      startBlockTimestamp: undefined,
+      endBlockTimestamp: undefined} as WrappedTxData
   });
   const getTxnData = async function(txHash: string) : Promise<TxRowData> {
     const provider = getCoinbaseNodeProvider();
@@ -139,27 +151,47 @@ function App() {
     };
     return txData;
   }
-  const getTxnsData = async function(receiptQuery: ReceiptQuery) : Promise<TxRowData[]> {
+  const getTxnsData = async function(receiptQuery: ReceiptQuery) : Promise<WrappedTxData> {
     const txHashes = receiptQuery.txHashes;
     if(txHashes.length > 0){
-    const txDataPromises : Promise<TxRowData>[] = [];
-    for(let txHash of txHashes) {
-      txDataPromises.push(getTxnData(txHash));
-    }
-    return await Promise.all(txDataPromises);
+      const txDataPromises : Promise<TxRowData>[] = [];
+      for(let txHash of txHashes) {
+        txDataPromises.push(getTxnData(txHash));
+      }
+      return {txData: await Promise.all(txDataPromises), startBlockTimestamp: undefined, endBlockTimestamp: undefined};
     } else {
+      if(typeof receiptQuery.blockStart === 'undefined' && typeof receiptQuery.msStart !== 'undefined') {
+        receiptQuery.blockStart = await getHexBlockNumberJustBeforeTimestamp(receiptQuery.msStart);
+      }
+      if(typeof receiptQuery.blockEnd === 'undefined' && typeof receiptQuery.msEnd !== 'undefined') {
+        receiptQuery.blockEnd = await getHexBlockNumberJustBeforeTimestamp(receiptQuery.msEnd);
+      }
+      let startBlockTimestamp = undefined;
+      let endBlockTimestamp = undefined;
+      if(typeof receiptQuery.blockStart !== 'undefined' || typeof receiptQuery.blockEnd !== 'undefined') {
+        const provider = getCoinbaseNodeProvider();
+        if(typeof receiptQuery.blockStart !== 'undefined') {
+          const block = await provider.getBlock(receiptQuery.blockStart);
+          startBlockTimestamp = new Date(block.timestamp*1000);
+        }
+        if(typeof receiptQuery.blockEnd !== 'undefined') {
+          const block = await provider.getBlock(receiptQuery.blockEnd);
+          endBlockTimestamp = new Date(block.timestamp*1000);
+        }
+      }
       //get address data; TODO make these not mutually exclusive.
-      return getTxDataForAddresses(receiptQuery.addresses, receiptQuery.blockStart, receiptQuery.blockEnd);
+      return {startBlockTimestamp, endBlockTimestamp, txData: await getTxDataForAddresses(receiptQuery.addresses, receiptQuery.blockStart, receiptQuery.blockEnd)};
     }
   }
   const getAndDisplayTxnsData = async function(receiptQuery: ReceiptQuery | undefined) {
     if(typeof receiptQuery === 'undefined') {
       return;
     }
-    const txData = await getTxnsData(receiptQuery);
-    console.log('txData:',txData);
-    setTxData(txData);
-    return txData;
+    let wrappedTxData = undefined;
+    wrappedTxData= await getTxnsData(receiptQuery);
+    console.log('wrappedTxData:',wrappedTxData);
+    setTxData(wrappedTxData);
+    return wrappedTxData;
   }
   useEffect(() => { getAndDisplayTxnsData(receiptQuery); },[]); //https://stackoverflow.com/a/71434389/
   if(typeof receiptQuery === 'undefined') {
@@ -247,10 +279,15 @@ function App() {
         <p className="mode">
           This is a receipt for
           {receiptQuery.txHashes.length > 0 ?
-          (receiptQuery.txHashes.length === 1 ? ' a specified transaction' : ' specified transactions') :
-          (receiptQuery.addresses.length === 1 ? ' a specified account' : ' specified accounts') }.
+          (receiptQuery.txHashes.length === 1 ? ' a specified transaction' : ' specified transactions') : (
+          (typeof wrappedTxData.startBlockTimestamp === 'undefined' ?
+          (typeof wrappedTxData.endBlockTimestamp === 'undefined' ? (' the entire history ') : (' the entire history until ' + wrappedTxData.endBlockTimestamp)) :
+          (typeof wrappedTxData.endBlockTimestamp === 'undefined' ? (' the history starting from ' + wrappedTxData.startBlockTimestamp) :
+          (' the history from ' + wrappedTxData.startBlockTimestamp + ' through ' + wrappedTxData.endBlockTimestamp))) +
+          ' of'+(receiptQuery.addresses.length === 1 ? ' a specified account' : ' specified accounts')
+          )}.
         </p>
-        {txData.length > 0 ? '' :
+        {wrappedTxData.txData.length > 0 ? '' :
           <p className="mode">Data has not yet finished loading.</p>
         }
         <div className="receiptAndExplanationWrapper">
@@ -285,7 +322,7 @@ function App() {
             </thead>
             <tbody>
               {
-                txData.map(getTxRow)
+                wrappedTxData.txData.map(getTxRow)
               }
             </tbody>
           </table>
@@ -322,7 +359,8 @@ function getCoinbaseNodeProvider() {
 function getTxRow(txData: TxRowData) {
     return (
       <tr className="singleTxReceipt" key={txData.txID}>
-        <td style={{maxWidth: "10em"}}><span className="txID">{txData.txID}</span></td>
+        <td style={{maxWidth: "10em"}}><a className="txID"
+        href={'https://etherscan.io/tx/' + txData.txID} target='_blank'>{txData.txID}</a></td>
         <td style={{maxWidth: "10em"}}>{txData.from}</td>
         <td style={{maxWidth: "10em"}}>{txData.to}</td>
         <td style={{maxWidth: "10em"}}>{txData.timestamp.toString()}</td>
@@ -334,32 +372,49 @@ function getTxRow(txData: TxRowData) {
     );
 }
 
-function checkURLForTxIDs(): ReceiptQuery | undefined {
+function getReceiptQueryFromURL(): ReceiptQuery | undefined {
   //TODO: This currently ignores addresses if any transactions are defined;
   //they could technically coexist.
   const pathname = window.location.pathname;
   const SINGLE_TX_START = "/tx/";
   const ADDRESS_START = "/acct/";
+  const urlSearchParams = new URLSearchParams(window.location.search);
+  const urlSearchParamsTx = urlSearchParams.get("tx");
+  const urlSearchParamsAddr = urlSearchParams.get("acct");
+  const urlSearchParamsBlockStart = urlSearchParams.get("blockStart");
+  const urlSearchParamsBlockEnd = urlSearchParams.get("blockEnd");
+  const urlSearchParamsMsStart = urlSearchParams.get("start");
+  const urlSearchParamsMsEnd = urlSearchParams.get("end");
+  let partialResult: Partial<ReceiptQuery> = {};
+  if(urlSearchParamsBlockStart !== null) {
+    partialResult.blockStart = urlSearchParamsBlockStart.startsWith('0x') ? urlSearchParamsBlockStart : convertToHex(urlSearchParamsBlockStart);
+  }
+  if(urlSearchParamsBlockEnd !== null) {
+    partialResult.blockEnd = urlSearchParamsBlockEnd.startsWith('0x') ? urlSearchParamsBlockEnd : convertToHex(urlSearchParamsBlockEnd);
+  }
+  if(urlSearchParamsMsStart !== null) {
+    partialResult.msStart = new Date(parseInt(urlSearchParamsMsStart));
+  }
+  if(urlSearchParamsMsEnd !== null) {
+    partialResult.msEnd = new Date(parseInt(urlSearchParamsMsEnd));
+  }
   if (pathname.startsWith(SINGLE_TX_START)) {
-    return {
+    return Object.assign({
       txHashes: splitToMultipleIDs(getPathPortionEndingAtOptionalSlash(pathname, SINGLE_TX_START.length)),
       addresses: [],
-    };
+    }, partialResult);
   } else {
-    const urlSearchParams = new URLSearchParams(window.location.search);
-    const urlSearchParamsTx = urlSearchParams.get("tx");
-    const urlSearchParamsAddr = urlSearchParams.get("acct");
     if (urlSearchParamsTx !== null) {
-      return {
+      return Object.assign({
         txHashes: splitToMultipleIDs(urlSearchParamsTx),
         addresses: [],
-      };
+      }, partialResult);
     } else if(pathname.startsWith(ADDRESS_START)) {
       const addresses = splitToMultipleIDs(getPathPortionEndingAtOptionalSlash(pathname, ADDRESS_START.length));
-      return {addresses, txHashes: []};
+      return Object.assign({addresses, txHashes: []}, partialResult);
     } else if(urlSearchParamsAddr !== null) {
       const addresses = splitToMultipleIDs(urlSearchParamsAddr);
-      return {addresses, txHashes: []};
+      return Object.assign({addresses, txHashes: []}, partialResult);
     }
   }
 }
@@ -537,6 +592,22 @@ async function getEthPriceInUSD(blockTimestamp : number | undefined ) : Promise<
       console.log("Eth Price: ", JSON.parse(result).data.tokens[0].dayData[0].priceUSD);
       return JSON.parse(result).data.tokens[0].dayData[0].priceUSD;
   }).catch(error => console.log('error', error));
+}
+
+async function getHexBlockNumberJustBeforeTimestamp(
+  timestamp: Date
+) : Promise<string> {
+  return ethers.BigNumber.from((await getBlockInfoJustBeforeTimestamp(timestamp)).block).toHexString();
+}
+
+async function getBlockInfoJustBeforeTimestamp(
+  timestamp: Date
+) : Promise<EthDater.BlockResult> {
+  return dater.getDate(timestamp, false, false);
+}
+
+function convertToHex(stringNumIn: ethers.BigNumberish) {
+  return ethers.BigNumber.from(stringNumIn).toHexString();
 }
 
 export default App;
