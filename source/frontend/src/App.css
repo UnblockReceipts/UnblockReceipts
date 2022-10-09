@@ -43,8 +43,8 @@
 
 .txReceiptsTable {
   border-collapse: collapse;
-  margin: 10px;
   border-bottom: thin black solid;
+  width: 100%;
 }
 
 .txReceiptsTable tbody tr {
@@ -61,8 +61,10 @@
   padding: 10px;
 }
 
-.explanation {
-  margin: 10px;
+.receiptAndExplanationWrapper {
+  margin-left: auto;
+  margin-right: auto;
+  width: 95%;
 }
 
 @keyframes App-logo-spin {

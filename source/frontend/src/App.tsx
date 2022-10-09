@@ -145,6 +145,7 @@ function App() {
         <h1 style={{textAlign: "center" }}>
           Decentralized network transaction receipt
         </h1>
+        <div className="receiptAndExplanationWrapper">
         <table className="txReceiptsTable">
           <thead>
             <tr>
@@ -184,6 +185,7 @@ function App() {
           On this decentralized network, the "transaction fee" (abbreviated "Tx fee") incentivizes network participants to
           do the work needed to include this transaction in the ledger.
         </p>
+        </div>
       </>
     );
   }
