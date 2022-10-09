@@ -97,10 +97,12 @@ function App() {
             <input
               id="txHashInput"
               placeholder="e.g. 0x60286c0fee3a46697e3ea4b04bc229f5db4b65d001d93563351fb66d81bf06b2"
-              onChange={(ev: React.ChangeEvent) => {
-                const inputElement = ev.target;
+              />
+            <button
+              onClick={(ev: React.MouseEvent) => {
+                const inputElement = document.getElementById("txHashInput");
                 if(!(inputElement instanceof HTMLInputElement)) {
-                  throw new Error('Input element was not of the expected type - this should never happen.');
+                  throw new Error('txHashInput element was not of the expected type - this should never happen.');
                 }
                 const inputValue = inputElement.value;
                 const inputValueSplit = inputValue.split(',');
@@ -118,7 +120,7 @@ function App() {
                   window.location.pathname = '/tx/' + inputValue;
                 }
               }}
-            />
+            >Get receipt!</button>
             <br />
             In the future, you will be able to see multiple transactions for specified account(s), starting with account(s) in your wallet:
           </div>
