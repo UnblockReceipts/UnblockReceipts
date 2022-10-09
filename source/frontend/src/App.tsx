@@ -189,7 +189,6 @@ function App() {
     }
     let wrappedTxData = undefined;
     wrappedTxData= await getTxnsData(receiptQuery);
-    console.log('wrappedTxData:',wrappedTxData);
     setTxData(wrappedTxData);
     return wrappedTxData;
   }
@@ -526,7 +525,6 @@ async function getAllTxDataAboutAddress(
     "blockchain": "Ethereum", //currently the only option; "Polygon" and "Optimism" and "Arbitrum" to be added.
     "network": "Mainnet" //"Goerli" also supported
   }) as TransactionsByAddressResult;
-  console.log('Coinbase call result: ',singleCallResult);
   resultBlockSet.push(...singleCallResult.result.blocks);
   //Pagination handling:
   let requestedBlockStart = ethers.BigNumber.from(blockStart);
@@ -633,7 +631,7 @@ async function getEthPriceInUSD(blockTimestamp : number | undefined ) : Promise<
     body: graphql,
     redirect: 'follow'
   }).then(response => response.text()).then(result => {
-      console.log("Eth Price: ", JSON.parse(result).data.tokens[0].dayData[0].priceUSD);
+      //console.log("Eth Price: ", JSON.parse(result).data.tokens[0].dayData[0].priceUSD);
       return JSON.parse(result).data.tokens[0].dayData[0].priceUSD;
   }).catch(error => console.log('error', error));
 }
