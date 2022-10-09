@@ -517,7 +517,7 @@ async function getEthPriceInUSD(blockTimestamp : number | undefined ) : Promise<
   var myHeaders = new Headers();
   myHeaders.append("Content-Type", "application/json");
   var graphql = JSON.stringify({
-    query: "query oneQuery($pricedate: Int!){\n  tokens(where: { id: \"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2\"}){\n    id\n    name\n    tokenDayData(where:{ date: $pricedate }){\n      priceUSD\n    }\n  }\n}",
+    query: "query oneQuery($pricedate: Int!){\n  tokens(where: { id: \"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2\"}){\n    id\n    name\n    dayData(where:{ date: $pricedate }){\n      priceUSD\n    }\n  }\n}",
     variables: {"pricedate":blockTimestamp}
   })
   var requestOptions = {
@@ -526,14 +526,14 @@ async function getEthPriceInUSD(blockTimestamp : number | undefined ) : Promise<
     body: graphql,
     redirect: 'follow'
   };
-  return fetch("https://gateway.thegraph.com/api/33a2a1eab893fdcc1b8b1cd38dcf7d0a/subgraphs/id/2szAn45skWZFLPUbxFEtjiEzT1FMW8Ff5ReUPbZbQxtt?pricedate=priceDate", {
+  return fetch("https://api.thegraph.com/subgraphs/name/sushiswap/exchange", {
     method: 'POST',
     headers: myHeaders,
     body: graphql,
     redirect: 'follow'
   }).then(response => response.text()).then(result => {
-      console.log(JSON.parse(result).data.tokens[0].tokenDayData[0].priceUSD);
-      return JSON.parse(result).data.tokens[0].tokenDayData[0].priceUSD;
+      console.log("Eth Price: ", JSON.parse(result).data.tokens[0].dayData[0].priceUSD);
+      return JSON.parse(result).data.tokens[0].dayData[0].priceUSD;
   }).catch(error => console.log('error', error));
 }
 
