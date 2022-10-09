@@ -146,8 +146,8 @@ function App() {
       gasFeeETHwei,
       gasFeeUSD,
       timestamp: new Date(block.timestamp*1000),
-      to: receipt.to,
-      from: receipt.from,
+      to: await showAddress(receipt.to),
+      from: await showAddress(receipt.from),
     };
     return txData;
   }
@@ -383,6 +383,16 @@ function getTxRow(txData: TxRowData) {
     );
 }
 
+async function showAddress(hexAddress: string) : Promise<string> {
+  let provider = new ethers.providers.CloudflareProvider();
+  let reverseLookup = await provider.lookupAddress(hexAddress);
+  if(reverseLookup === null) {
+    return hexAddress;
+  } else {
+    return reverseLookup;
+  }
+}
+
 function getReceiptQueryFromURL(): ReceiptQuery | undefined {
   //TODO: This currently ignores addresses if any transactions are defined;
   //they could technically coexist.
@@ -454,8 +464,8 @@ async function getTxDataForAddresses(
         gasFeeETHwei,
         gasFeeUSD,
         timestamp,
-        from: txn.from,
-        to: txn.to,
+        from: await showAddress(txn.from),
+        to: await showAddress(txn.to),
       });
     }
   }
