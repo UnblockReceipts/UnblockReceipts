@@ -141,11 +141,15 @@ function App() {
       return;
     }
     const txHashes = receiptQuery.txHashes;
+    if(txHashes.length > 0){
     const txDataPromises : Promise<TxRowData>[] = [];
     for(let txHash of txHashes) {
       txDataPromises.push(getTxnData(txHash));
     }
     const txData = await Promise.all(txDataPromises);
+    } else {
+      //get address data; TODO make these not mutually exclusive.
+    }
     console.log('txData:',txData);
     setTxData(txData);
     return txData;
