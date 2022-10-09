@@ -146,8 +146,8 @@ function App() {
       gasFeeETHwei,
       gasFeeUSD,
       timestamp: new Date(block.timestamp*1000),
-      to: receipt.to,
-      from: receipt.from,
+      to: await showAddress(receipt.to),
+      from: await showAddress(receipt.from),
     };
     return txData;
   }
@@ -189,7 +189,6 @@ function App() {
     }
     let wrappedTxData = undefined;
     wrappedTxData= await getTxnsData(receiptQuery);
-    console.log('wrappedTxData:',wrappedTxData);
     setTxData(wrappedTxData);
     return wrappedTxData;
   }
@@ -383,6 +382,38 @@ function getTxRow(txData: TxRowData) {
     );
 }
 
+async function resolveENSsIfNecessary(addressesIn: string[]): Promise<string[]> {
+  let promises : Promise<string>[] = [];
+  for (let address of addressesIn) {
+    promises.push(resolveENSIfNecessary(address))
+  }
+  return await Promise.all(promises);
+}
+
+async function resolveENSIfNecessary(addressIn: string): Promise<string> {
+  const provider = new ethers.providers.CloudflareProvider();
+  const resolvedName = await provider.resolveName(addressIn);
+  if(resolvedName === null) {
+    return addressIn;
+  } else {
+    return resolvedName;
+  }
+}
+
+async function showAddress(hexAddress: string) : Promise<string> {
+  const provider = new ethers.providers.CloudflareProvider();
+  const reverseLookup = await provider.lookupAddress(hexAddress);
+  //NOTE: Reverse resolution doesn't always work if the owner doesn't have it configured;
+  //see https://docs.ens.domains/contract-api-reference/reverseregistrar
+  if(reverseLookup === null) {
+    //console.log('Reverse lookup for ' + hexAddress + ' found no ENS name.');
+    return hexAddress;
+  } else {
+    //console.log('Reverse lookup for ' + hexAddress + ' found ENS name ' + reverseLookup);
+    return reverseLookup;
+  }
+}
+
 function getReceiptQueryFromURL(): ReceiptQuery | undefined {
   //TODO: This currently ignores addresses if any transactions are defined;
   //they could technically coexist.
@@ -435,7 +466,10 @@ async function getTxDataForAddresses(
   blockStart: string = 'genesis',
   blockEnd: string = 'latest'
 ) : Promise<TxRowData[]> {
-  const blockTransactions = await convertAddressesToTxList(addresses, blockStart, blockEnd);
+  //console.log('About to convert addresses: ',addresses);
+  const convertedAddresses = await resolveENSsIfNecessary(addresses);
+  //console.log('Converted to: ',convertedAddresses);
+  const blockTransactions = await convertAddressesToTxList(convertedAddresses, blockStart, blockEnd);
   let result: TxRowData[] = [];
   for(let blockTransaction of blockTransactions) {
     const timestampInt = parseInt(blockTransaction.blockTimestamp, 16);
@@ -454,8 +488,8 @@ async function getTxDataForAddresses(
         gasFeeETHwei,
         gasFeeUSD,
         timestamp,
-        from: txn.from,
-        to: txn.to,
+        from: await showAddress(txn.from),
+        to: await showAddress(txn.to),
       });
     }
   }
@@ -491,7 +525,6 @@ async function getAllTxDataAboutAddress(
     "blockchain": "Ethereum", //currently the only option; "Polygon" and "Optimism" and "Arbitrum" to be added.
     "network": "Mainnet" //"Goerli" also supported
   }) as TransactionsByAddressResult;
-  console.log('Coinbase call result: ',singleCallResult);
   resultBlockSet.push(...singleCallResult.result.blocks);
   //Pagination handling:
   let requestedBlockStart = ethers.BigNumber.from(blockStart);
@@ -522,9 +555,7 @@ function makeHTTPRequestToCoinbaseCloud(
     };
     const req = new XMLHttpRequest();
     req.onload = function () {
-      console.log('In onload handler from request to coinbase.');
       const response = req.response;
-      console.log('XHR Response from coinbase: ' + typeof response, response);
       if(response?.error) {
         console.error('Error response from XMLHttpRequest to Coinbase Cloud:', response); //might still be an HTTP 200!
       }
@@ -600,7 +631,7 @@ async function getEthPriceInUSD(blockTimestamp : number | undefined ) : Promise<
     body: graphql,
     redirect: 'follow'
   }).then(response => response.text()).then(result => {
-      console.log("Eth Price: ", JSON.parse(result).data.tokens[0].dayData[0].priceUSD);
+      //console.log("Eth Price: ", JSON.parse(result).data.tokens[0].dayData[0].priceUSD);
       return JSON.parse(result).data.tokens[0].dayData[0].priceUSD;
   }).catch(error => console.log('error', error));
 }
