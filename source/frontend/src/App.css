@@ -41,12 +41,30 @@
   word-wrap: break-word;
 }
 
+.txReceiptsTable {
+  border-collapse: collapse;
+  border-bottom: thin black solid;
+  width: 100%;
+}
+
 .txReceiptsTable tbody tr {
   border-top: thin black solid;
 }
 
 #txHashInput {
-  width: 37em;
+  width: 38em;
+}
+
+.slogan {
+  font-style: italic;
+  float: right;
+  padding: 10px;
+}
+
+.receiptAndExplanationWrapper {
+  margin-left: auto;
+  margin-right: auto;
+  width: 95%;
 }
 
 @keyframes App-logo-spin {

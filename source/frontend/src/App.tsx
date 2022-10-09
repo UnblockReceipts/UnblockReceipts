@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Navbar from "./components/Header";
 import unblockReceiptLogo from "./images/unblockReceiptLogo.png";
+import unblockReceiptLogoTight from "./images/unblockReceiptLogoTight.png";
 import './App.css';
 import { ethers } from 'ethers';
 
@@ -96,10 +97,12 @@ function App() {
             <input
               id="txHashInput"
               placeholder="e.g. 0x60286c0fee3a46697e3ea4b04bc229f5db4b65d001d93563351fb66d81bf06b2"
-              onChange={(ev: React.ChangeEvent) => {
-                const inputElement = ev.target;
+              />
+            <button
+              onClick={(ev: React.MouseEvent) => {
+                const inputElement = document.getElementById("txHashInput");
                 if(!(inputElement instanceof HTMLInputElement)) {
-                  throw new Error('Input element was not of the expected type - this should never happen.');
+                  throw new Error('txHashInput element was not of the expected type - this should never happen.');
                 }
                 const inputValue = inputElement.value;
                 const inputValueSplit = inputValue.split(',');
@@ -117,7 +120,7 @@ function App() {
                   window.location.pathname = '/tx/' + inputValue;
                 }
               }}
-            />
+            >Get receipt!</button>
             <br />
             In the future, you will be able to see multiple transactions for specified account(s), starting with account(s) in your wallet:
           </div>
@@ -134,55 +137,59 @@ function App() {
     return (
       <>
         {/*<Navbar />*/}
+        <a href='/'>
         <img
-            src={unblockReceiptLogo}
+            src={unblockReceiptLogoTight}
             className="App-logo"
             alt="logo"
-            style={{ height: "180px", paddingBottom: "1rem" }}
+            style={{ height: "5em", padding: "1em" }}
         />
-        <span className="slogan">Spend your tokens, not your time</span>
-        <h1>
-          Decentralized network transaction receipt
+        </a>
+        <span className="slogan">Spend your tokens, not your time!</span>
+        <h1 style={{textAlign: "center" }}>
+          Transaction receipt
         </h1>
-        <table className="txReceiptsTable">
-          <thead>
-            <tr>
-              <td>
-                Transaction ID
-              </td>
-              <td>
-                From
-              </td>
-              <td>
-                To
-              </td>
-              <td title="This transaction took place on">
-                Date/Time
-              </td>
-              <td>
-                ETH sent (ETH)
-              </td>
-              <td>
-                Tx fee (ETH)
-              </td>
-              <td>
-                ETH sent (USD)
-              </td>
-              <td>
-                Tx fee (USD)
-              </td>
-            </tr>
-          </thead>
-        <tbody>
-          {
-            txData.map(getTxRow)
-          }
-        </tbody>
-        </table>
-        <p>
-          On this decentralized network, the "transaction fee" (abbreviated "Tx fee") incentivizes network participants to
-          do the work needed to include this transaction in the ledger.
-        </p>
+        <div className="receiptAndExplanationWrapper">
+          <table className="txReceiptsTable">
+            <thead>
+              <tr>
+                <td>
+                  Transaction ID
+                </td>
+                <td>
+                  From
+                </td>
+                <td>
+                  To
+                </td>
+                <td title="This transaction took place on">
+                  Date/Time
+                </td>
+                <td>
+                  ETH sent<br />(ETH)
+                </td>
+                <td>
+                  Tx fee<br />(ETH)
+                </td>
+                <td>
+                  ETH sent<br />(USD)
+                </td>
+                <td>
+                  Tx fee<br />(USD)
+                </td>
+              </tr>
+            </thead>
+            <tbody>
+              {
+                txData.map(getTxRow)
+              }
+            </tbody>
+          </table>
+          <p className="explanation">
+            On this decentralized network, the "transaction fee" (abbreviated "Tx fee") incentivizes network participants to
+            do the work needed to include this transaction in the ledger.
+          </p>
+        </div>
       </>
     );
   }
@@ -191,10 +198,10 @@ function App() {
 function getTxRow(txData: TxRowData) {
     return (
       <tr className="singleTxReceipt" key={txData.txID}>
-        <td><span className="txID">{txData.txID}</span></td>
-        <td>{txData.from}</td>
-        <td>{txData.to}</td>
-        <td>{txData.timestamp.toString()}</td>
+        <td style={{maxWidth: "10em"}}><span className="txID">{txData.txID}</span></td>
+        <td style={{maxWidth: "10em"}}>{txData.from}</td>
+        <td style={{maxWidth: "10em"}}>{txData.to}</td>
+        <td style={{maxWidth: "10em"}}>{txData.timestamp.toString()}</td>
         <td>{ethers.utils.formatUnits(txData.value, 'ether')}</td>
         <td>{ethers.utils.formatUnits(txData.gasFeeETHwei, 'ether')}</td>
         <td>${parseInt(txData.valueUSDCents.toString())/100}</td>

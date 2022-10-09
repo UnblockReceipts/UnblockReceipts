@@ -25,7 +25,7 @@ export default function Navbar() {
             />
           </Typography>
           <div style={{marginRight: '0', fontStyle: 'italic'}}>
-            Spend your tokens, not your time
+            Spend your tokens, not your time!
           </div>
         </Toolbar>
       </AppBar>
