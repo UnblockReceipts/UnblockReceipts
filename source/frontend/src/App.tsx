@@ -149,6 +149,10 @@ function App() {
         <h1 style={{textAlign: "center" }}>
           Transaction receipt
         </h1>
+        <p className="mode">
+          This is a receipt for
+          {txData.length === 1 ? ' a specified transaction' : ' specified transactions'}.
+        </p>
         <div className="receiptAndExplanationWrapper">
           <table className="txReceiptsTable">
             <thead>
