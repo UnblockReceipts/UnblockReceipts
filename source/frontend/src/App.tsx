@@ -248,6 +248,15 @@ function checkURLForTxIDs(): string[] | undefined {
     const urlSearchParamsTx = urlSearchParams.get("tx");
     if (urlSearchParamsTx !== null) {
       return splitToMultipleIDs(urlSearchParamsTx);
+
+async function convertAddressesToTxList(addresses: string[], blockStart: string = 'genesis', blockEnd: string = 'latest') : Promise<string[]> {
+  let result = [];
+  for(let address of addresses) {
+    result.push(...(await getAllTxDataAboutAddress(address, blockStart, blockEnd)));
+  }
+  return result;
+}
+
 async function getAllTxDataAboutAddress(address: string, blockStart: string = 'genesis', blockEnd: string = 'latest') : Promise<string[]> {
   let result: string[] = [];
   //TODO: Handle pagination
