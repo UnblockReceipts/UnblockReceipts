@@ -236,7 +236,7 @@ function App() {
         </h1>
         <p className="mode">
           This is a receipt for
-          {txData.length === 1 ? ' a specified transaction' : ' specified transactions'}.
+          {(txData.length === 1 ? ' a specified transaction' : ' specified transactions')}.
         </p>
         {txData.length > 0 ? '' :
           <p className="mode">Data has not yet finished loading.</p>
