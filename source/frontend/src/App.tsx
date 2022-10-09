@@ -383,6 +383,24 @@ function getTxRow(txData: TxRowData) {
     );
 }
 
+async function resolveENSsIfNecessary(addressesIn: string[]): Promise<string[]> {
+  let promises : Promise<string>[] = [];
+  for (let address of addressesIn) {
+    promises.push(resolveENSIfNecessary(address))
+  }
+  return await Promise.all(promises);
+}
+
+async function resolveENSIfNecessary(addressIn: string): Promise<string> {
+  const provider = new ethers.providers.CloudflareProvider();
+  const resolvedName = await provider.resolveName(addressIn);
+  if(resolvedName === null) {
+    return addressIn;
+  } else {
+    return resolvedName;
+  }
+}
+
 async function showAddress(hexAddress: string) : Promise<string> {
   let provider = new ethers.providers.CloudflareProvider();
   let reverseLookup = await provider.lookupAddress(hexAddress);
@@ -445,7 +463,8 @@ async function getTxDataForAddresses(
   blockStart: string = 'genesis',
   blockEnd: string = 'latest'
 ) : Promise<TxRowData[]> {
-  const blockTransactions = await convertAddressesToTxList(addresses, blockStart, blockEnd);
+  const convertedAddresses = await resolveENSsIfNecessary(addresses);
+  const blockTransactions = await convertAddressesToTxList(convertedAddresses, blockStart, blockEnd);
   let result: TxRowData[] = [];
   for(let blockTransaction of blockTransactions) {
     const timestampInt = parseInt(blockTransaction.blockTimestamp, 16);
