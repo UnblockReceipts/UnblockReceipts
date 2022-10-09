@@ -192,10 +192,10 @@ function App() {
 function getTxRow(txData: TxRowData) {
     return (
       <tr className="singleTxReceipt" key={txData.txID}>
-        <td><span className="txID">{txData.txID}</span></td>
-        <td>{txData.from}</td>
-        <td>{txData.to}</td>
-        <td>{txData.timestamp.toString()}</td>
+        <td style={{maxWidth: "10em"}}><span className="txID">{txData.txID}</span></td>
+        <td style={{maxWidth: "10em"}}>{txData.from}</td>
+        <td style={{maxWidth: "10em"}}>{txData.to}</td>
+        <td style={{maxWidth: "10em"}}>{txData.timestamp.toString()}</td>
         <td>{ethers.utils.formatUnits(txData.value, 'ether')}</td>
         <td>{ethers.utils.formatUnits(txData.gasFeeETHwei, 'ether')}</td>
         <td>${parseInt(txData.valueUSDCents.toString())/100}</td>
