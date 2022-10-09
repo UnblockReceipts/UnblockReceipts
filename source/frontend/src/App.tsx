@@ -526,13 +526,10 @@ async function getPriceOfETHInUSD(onDate: number = 1601596800) {
     headers: myHeaders,
     body: graphql,
     redirect: 'follow'
-  })
-    .then(response => response.text())
-    .then(result => {
+  }).then(response => response.text()).then(result => {
       console.log(JSON.parse(result).data.tokens[0].tokenDayData[0].priceUSD);
       return JSON.parse(result).data.tokens[0].tokenDayData[0].priceUSD;
-    })
-    .catch(error => console.log('error', error));
+    }).catch(error => console.log('error', error));
 }
 
 //TODO: May need to rethink how this works while still avoiding issues with BigNumbers only handling integer values. Maybe inverse?
