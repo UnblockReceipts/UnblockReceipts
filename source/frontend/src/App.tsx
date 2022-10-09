@@ -343,14 +343,10 @@ function getReceiptQueryFromURL(): ReceiptQuery | undefined {
   const urlSearchParamsSecStart = urlSearchParams.get("start");
   const urlSearchParamsSecEnd = urlSearchParams.get("end");
   let partialResult: Partial<ReceiptQuery> = {};
-  if(urlSearchParamsBlockStart === null) {
-
-  } else {
+  if(urlSearchParamsBlockStart !== null) {
     partialResult.blockStart = urlSearchParamsBlockStart;
   }
-  if(urlSearchParamsBlockEnd === null) {
-
-  } else {
+  if(urlSearchParamsBlockEnd !== null) {
     partialResult.blockEnd = urlSearchParamsBlockEnd;
   }
   if(urlSearchParamsSecStart !== null) {
