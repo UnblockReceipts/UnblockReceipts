@@ -402,8 +402,8 @@ async function resolveENSIfNecessary(addressIn: string): Promise<string> {
 }
 
 async function showAddress(hexAddress: string) : Promise<string> {
-  let provider = new ethers.providers.CloudflareProvider();
-  let reverseLookup = await provider.lookupAddress(hexAddress);
+  const provider = new ethers.providers.CloudflareProvider();
+  const reverseLookup = await provider.lookupAddress(hexAddress);
   if(reverseLookup === null) {
     return hexAddress;
   } else {
