@@ -519,7 +519,6 @@ async function getPriceOfETHInUSD(onDate: number = 1601596800) {
   })
     .then(response => response.text())
     .then(result => {
-      
       console.log(JSON.parse(result).data.tokens[0].tokenDayData[0].priceUSD);
       return JSON.parse(result).data.tokens[0].tokenDayData[0].priceUSD;
     })
