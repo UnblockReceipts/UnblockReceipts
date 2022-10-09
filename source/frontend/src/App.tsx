@@ -17,6 +17,8 @@ interface DataForDisplay {
 interface ReceiptQuery {
   addresses: string[];
   txHashes: string[];
+  blockStart?: string;
+  blockEnd?: string;
 }
 
 interface TokenTransfer {
@@ -136,26 +138,27 @@ function App() {
     };
     return txData;
   }
-  const getTxnsData = async function(receiptQuery: ReceiptQuery) {
+  const getTxnsData = async function(receiptQuery: ReceiptQuery) : Promise<TxRowData[]> {
     const txHashes = receiptQuery.txHashes;
     if(txHashes.length > 0){
     const txDataPromises : Promise<TxRowData>[] = [];
     for(let txHash of txHashes) {
       txDataPromises.push(getTxnData(txHash));
     }
-    const txData = await Promise.all(txDataPromises);
+    return await Promise.all(txDataPromises);
     } else {
       //get address data; TODO make these not mutually exclusive.
+      return getTxDataForAddresses(receiptQuery.addresses, receiptQuery.blockStart, receiptQuery.blockEnd);
     }
-    console.log('txData:',txData);
-    setTxData(txData);
-    return txData;
   }
   const getAndDisplayTxnsData = async function(receiptQuery: ReceiptQuery | undefined) {
     if(typeof receiptQuery === 'undefined') {
       return;
     }
-    return getTxnsData(receiptQuery);
+    const txData = await getTxnsData(receiptQuery);
+    console.log('txData:',txData);
+    setTxData(txData);
+    return txData;
   }
   useEffect(() => { getAndDisplayTxnsData(receiptQuery); },[]); //https://stackoverflow.com/a/71434389/
   if(typeof receiptQuery === 'undefined') {
@@ -335,6 +338,14 @@ function checkURLForTxIDs(): ReceiptQuery | undefined {
       return {addresses, txHashes: []};
     }
   }
+}
+
+async function getTxDataForAddresses(
+  addresses: string[],
+  blockStart: string = 'genesis',
+  blockEnd: string = 'latest'
+) : Promise<TxRowData[]> {
+
 }
 
 async function convertAddressesToTxList(
