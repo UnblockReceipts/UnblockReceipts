@@ -180,7 +180,7 @@ function App() {
           }
         </tbody>
         </table>
-        <p>
+        <p className="explanation">
           On this decentralized network, the "transaction fee" (abbreviated "Tx fee") incentivizes network participants to
           do the work needed to include this transaction in the ledger.
         </p>
