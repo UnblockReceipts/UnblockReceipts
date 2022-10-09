@@ -6,7 +6,7 @@ import './App.css';
 import { ethers } from 'ethers';
 import EthDater from 'ethereum-block-by-date';
 
-import { ConnectButton, useConnectModal } from '@web3modal/react'
+import { ConnectButton, useConnectModal, useAccount } from '@web3modal/react'
 
 type MODE = 'tx' | 'acct';
 
@@ -100,9 +100,9 @@ interface paramsForTxByAddress {
 interface TxRowData {
   txID: string;
   value: ethers.BigNumber;
-  valueUSDCents: ethers.BigNumber;
+  valueUSD: number;
   gasFeeETHwei: ethers.BigNumber;
-  gasFeeUSDCents: ethers.BigNumber;
+  gasFeeUSD: number;
   timestamp: Date;
   from: string | undefined;
   to: string | undefined;
@@ -112,6 +112,7 @@ const dater = new EthDater(new ethers.providers.CloudflareProvider());
 
 function App() {
   const { isOpen, open, close } = useConnectModal();
+  const { address, isConnected } = useAccount();
   const receiptQuery = getReceiptQueryFromURL();
   const [wrappedTxData, setTxData] = useState(function generateEmptyTxData() {
     return {txData: [] as TxRowData[],
@@ -126,24 +127,24 @@ function App() {
       throw new Error ('Got undefined block number in receipt for tx '+txHash);
     }
     const block = await provider.getBlock(receipt.blockNumber);
-    const weiPriceInUSDCents = await getWeiPriceInUSDCents(receipt.blockNumber);
+    const ethPriceInUSD = await getEthPriceInUSD(block.timestamp);
     //@ts-ignore that effectiveGasPrice might be undefined - it's undocumented but sometimes there.
     const gasPrice = (typeof receipt.effectiveGasPrice === 'undefined') ? txn.gasPrice : receipt.effectiveGasPrice;
     const gasUsed = (typeof receipt.gasUsed === 'undefined') ? ethers.BigNumber.from(0) : receipt.gasUsed;
     const gasFeeETHwei = (typeof gasPrice === 'undefined') ? ethers.BigNumber.from(0) : gasUsed.mul(gasPrice);
-    const gasFeeUSDCents = gasFeeETHwei.mul(weiPriceInUSDCents);
-    const valueUSDCents = txn.value.mul(weiPriceInUSDCents);
+    const gasFeeUSD = convertWeiToDollars(gasFeeETHwei, ethPriceInUSD);
+    const valueUSD = convertWeiToDollars(txn.value, ethPriceInUSD);
     console.log('gasPrice', gasPrice, 'gasUsed', gasUsed, 'gasFeeETHwei', gasFeeETHwei);
     const txData = {
       txID: txHash,
       value: txn.value,
-      valueUSDCents,
+      valueUSD,
       gasUsed: receipt.gasUsed,
       //cumulativeGasUsed: receipt.cumulativeGasUsed, //includes txes before the current one in the same block.
       gasPriceString: (typeof gasPrice === 'undefined') ? '' : gasPrice.toString(),
       gasLimit: txn.gasLimit,
       gasFeeETHwei,
-      gasFeeUSDCents,
+      gasFeeUSD,
       timestamp: new Date(block.timestamp*1000),
       to: receipt.to,
       from: receipt.from,
@@ -233,6 +234,7 @@ function App() {
             <input
               id="acctInput"
               placeholder="e.g. 0x0dc58008C371b240bAEE63Cb9D514C99d5e96c9A"
+              value={address}
               />
             <button
               onClick={(ev: React.MouseEvent) => {
@@ -240,7 +242,7 @@ function App() {
                 if(!(inputElement instanceof HTMLInputElement)) {
                   throw new Error('acctInput element was not of the expected type - this should never happen.');
                 }
-                const inputValue = inputElement.value;
+                const inputValue = address;
                 if(membersMatchExpectedLength(inputValue, 42)) {
                   window.location.pathname = '/acct/' + inputValue;
                 }
@@ -335,6 +337,11 @@ function App() {
             The time zone displayed above is based on viewer system settings, and does not necessarily reflect the time zone the
             person who initiated this transaction may have been in.
           </p>
+          <p className="explanation">
+            Conversion rates are drawn from <a href="https://thegraph.com/" target="_blank">The Graph's</a>
+            <a href="https://docs.uniswap.org/protocol/V2/reference/API/entities" target="_blank"> subgraph/index</a> of
+            Uniswap market pricing as of the date of each transaction listed above.
+          </p>
         </div>
       </>
     );
@@ -359,8 +366,8 @@ function getTxRow(txData: TxRowData) {
         <td style={{maxWidth: "10em"}}>{txData.timestamp.toString()}</td>
         <td>{ethers.utils.formatUnits(txData.value, 'ether')}</td>
         <td>{ethers.utils.formatUnits(txData.gasFeeETHwei, 'ether')}</td>
-        <td>${parseInt(txData.valueUSDCents.toString())/100}</td>
-        <td>${parseInt(txData.gasFeeUSDCents.toString())/100}</td>
+        <td>${txData.valueUSD}</td>
+        <td>${txData.gasFeeUSD}</td>
       </tr>
     );
 }
@@ -420,20 +427,21 @@ async function getTxDataForAddresses(
   const blockTransactions = await convertAddressesToTxList(addresses, blockStart, blockEnd);
   let result: TxRowData[] = [];
   for(let blockTransaction of blockTransactions) {
-    const timestamp = new Date(parseInt(blockTransaction.blockTimestamp, 16)*1000);
+    const timestampInt = parseInt(blockTransaction.blockTimestamp, 16);
+    const timestamp = new Date(timestampInt*1000);
     const blockNumber = parseInt(blockTransaction.blockNumber);
     for(let txn of blockTransaction.transactions) {
-      const weiPriceInUSDCents = await getWeiPriceInUSDCents(blockNumber);
+      const ethPriceInUSD = await getEthPriceInUSD(timestampInt);
       const value = ethers.BigNumber.from(txn.value);
       const gasFeeETHwei = ethers.BigNumber.from(txn.gasUsed).mul(txn.gasPrice);
-      const gasFeeUSDCents = gasFeeETHwei.mul(weiPriceInUSDCents);
-      const valueUSDCents = ethers.BigNumber.from(txn.value).mul(weiPriceInUSDCents);
+      const gasFeeUSD = convertWeiToDollars(gasFeeETHwei, ethPriceInUSD);
+      const valueUSD = convertWeiToDollars(ethers.BigNumber.from(txn.value), ethPriceInUSD);
       result.push({
         txID: txn.transactionHash,
         value,
-        valueUSDCents,
+        valueUSD,
         gasFeeETHwei,
-        gasFeeUSDCents,
+        gasFeeUSD,
         timestamp,
         from: txn.from,
         to: txn.to,
@@ -550,14 +558,24 @@ function membersMatchExpectedLength(possiblyCommaSeparatedList: string, expected
   return (countRightLength > 0 && countWrongLength === 0);
 }
 
-async function getPriceOfETHInUSD(onDate: number = 1601596800) {
+function convertWeiToDollars(wei: ethers.BigNumber, ethPriceInUSD: number) : number {
+  return parseFloat(ethers.utils.formatUnits(wei, 'ether'))*(ethPriceInUSD);
+}
 
+async function getEthPriceInUSD(blockTimestamp : number | undefined ) : Promise<number> {
+  if(typeof blockTimestamp === 'undefined') {
+    throw new Error('blockTimestamp should not be undefined for seeking exchange price.');
+  }
+  let blockDateObj = new Date(blockTimestamp*1000); //ms will already be 0
+  blockDateObj.setUTCHours(0);
+  blockDateObj.setUTCMinutes(0);
+  blockDateObj.setUTCSeconds(0);
+  blockTimestamp = blockDateObj.valueOf()/1000;
   var myHeaders = new Headers();
   myHeaders.append("Content-Type", "application/json");
-
   var graphql = JSON.stringify({
-    query: "query oneQuery($pricedate: Int!){\n  tokens(where: { id: \"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2\"}){\n    id\n    name\n    tokenDayData(where:{ date: $pricedate }){\n      priceUSD\n    }\n  }\n}",
-    variables: {"pricedate":onDate}
+    query: "query oneQuery($pricedate: Int!){\n  tokens(where: { id: \"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2\"}){\n    id\n    name\n    dayData(where:{ date: $pricedate }){\n      priceUSD\n    }\n  }\n}",
+    variables: {"pricedate":blockTimestamp}
   })
   var requestOptions = {
     method: 'POST',
@@ -565,24 +583,15 @@ async function getPriceOfETHInUSD(onDate: number = 1601596800) {
     body: graphql,
     redirect: 'follow'
   };
-
-  return fetch("https://gateway.thegraph.com/api/33a2a1eab893fdcc1b8b1cd38dcf7d0a/subgraphs/id/2szAn45skWZFLPUbxFEtjiEzT1FMW8Ff5ReUPbZbQxtt?pricedate=priceDate", {
+  return fetch("https://api.thegraph.com/subgraphs/name/sushiswap/exchange", {
     method: 'POST',
     headers: myHeaders,
     body: graphql,
     redirect: 'follow'
-  })
-    .then(response => response.text())
-    .then(result => {
-      console.log(JSON.parse(result).data.tokens[0].tokenDayData[0].priceUSD);
-      return JSON.parse(result).data.tokens[0].tokenDayData[0].priceUSD;
-    })
-    .catch(error => console.log('error', error));
-}
-
-//TODO: May need to rethink how this works while still avoiding issues with BigNumbers only handling integer values. Maybe inverse?
-async function getWeiPriceInUSDCents(blockNumber : number | undefined) : Promise<ethers.BigNumberish> {
-  return 1; //temporary placeholder
+  }).then(response => response.text()).then(result => {
+      console.log("Eth Price: ", JSON.parse(result).data.tokens[0].dayData[0].priceUSD);
+      return JSON.parse(result).data.tokens[0].dayData[0].priceUSD;
+  }).catch(error => console.log('error', error));
 }
 
 async function getHexBlockNumberJustBeforeTimestamp(
