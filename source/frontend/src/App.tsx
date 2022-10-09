@@ -228,13 +228,7 @@ function checkURLForTxIDs(): string[] | undefined {
   const pathname = window.location.pathname;
   const SINGLE_TX_START = "/tx/";
   if (pathname.startsWith(SINGLE_TX_START)) {
-    let txHashEndSlash = pathname.indexOf("/", SINGLE_TX_START.length);
-    let txHashEndsBefore = pathname.length;
-    if (txHashEndSlash >= 0) {
-      txHashEndsBefore = txHashEndSlash;
-    }
-    const txHash = pathname.substring(SINGLE_TX_START.length, txHashEndsBefore);
-    return splitToMultipleIDs(txHash);
+    return splitToMultipleIDs(getPathPortionEndingAtOptionalSlash(pathname, SINGLE_TX_START.length));
   } else {
     const urlSearchParams = new URLSearchParams(window.location.search);
     const urlSearchParamsTx = urlSearchParams.get("tx");
@@ -242,6 +236,15 @@ function checkURLForTxIDs(): string[] | undefined {
       return splitToMultipleIDs(urlSearchParamsTx);
     }
   }
+}
+
+function getPathPortionEndingAtOptionalSlash(strIn: string, startPos: number) {
+  let txHashEndSlash = strIn.indexOf("/", startPos);
+  let txHashEndsBefore = strIn.length;
+  if (txHashEndSlash >= 0) {
+    txHashEndsBefore = txHashEndSlash;
+  }
+  return strIn.substring(startPos, txHashEndsBefore);
 }
 
 function splitToMultipleIDs(strIn: string): string[] {
