@@ -345,7 +345,30 @@ async function getTxDataForAddresses(
   blockStart: string = 'genesis',
   blockEnd: string = 'latest'
 ) : Promise<TxRowData[]> {
-
+  const blockTransactions = await convertAddressesToTxList(addresses, blockStart, blockEnd);
+  let result: TxRowData[] = [];
+  for(let blockTransaction of blockTransactions) {
+    const timestamp = new Date(blockTransaction.blockTimestamp);
+    const blockNumber = parseInt(blockTransaction.blockNumber);
+    for(let txn of blockTransaction.transactions) {
+      const weiPriceInUSDCents = await getWeiPriceInUSDCents(blockNumber);
+      const value = ethers.BigNumber.from(txn.value);
+      const gasFeeETHwei = ethers.BigNumber.from(txn.gasUsed).mul(txn.gasPrice);
+      const gasFeeUSDCents = gasFeeETHwei.mul(weiPriceInUSDCents);
+      const valueUSDCents = ethers.BigNumber.from(txn.value).mul(weiPriceInUSDCents);
+      result.push({
+        txID: txn.transactionHash,
+        value,
+        valueUSDCents,
+        gasFeeETHwei,
+        gasFeeUSDCents,
+        timestamp,
+        from: txn.from,
+        to: txn.to,
+      });
+    }
+  }
+  return result;
 }
 
 async function convertAddressesToTxList(
