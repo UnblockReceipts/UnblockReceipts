@@ -14,6 +14,16 @@ interface DataForDisplay {
   TxRows: TxRowData[];
 }
 
+interface paramsForTxByAddress {
+  //https://docs.cloud.coinbase.com/node/reference/advanced-api-reference#coinbasecloud_gettransactionsbyaddress
+  "address": string; //"0x3cd751e6b0078be393132286c442345e5dc49699",
+  "blockStart": string; //e.g. "0xdc3500",
+  "blockEnd"?: string; //e.g. "0xdc3501", //see pagination
+  "addressFilter"?: "SENDER_ONLY" | "SENDER_OR_RECEIVER" | "RECEIVER_ONLY";
+  "blockchain"?: "Ethereum"; //currently the only option; "Polygon" and "Optimism" and "Arbitrum" to be added.
+  "network"?: "Mainnet" | "Goerli";
+}
+
 interface TxRowData {
   txID: string;
   value: ethers.BigNumber;
