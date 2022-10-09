@@ -232,8 +232,7 @@ function App() {
             <br />
             <input
               id="acctInput"
-              placeholder="e.g. 0x0dc58008C371b240bAEE63Cb9D514C99d5e96c9A"
-              value={address}
+              placeholder={address}
               />
             <button
               onClick={(ev: React.MouseEvent) => {
@@ -241,10 +240,8 @@ function App() {
                 if(!(inputElement instanceof HTMLInputElement)) {
                   throw new Error('acctInput element was not of the expected type - this should never happen.');
                 }
-                const inputValue = address;
-                if(membersMatchExpectedLength(inputValue, 42)) {
-                  window.location.search = '?acct=' + inputValue;
-                }
+                const inputValue = inputElement.value.length > 0 ? inputElement.value : address;
+                window.location.search = '?acct=' + inputValue;
               }}
             >Get receipt!</button> <em>Date-based filtering coming in the future!</em>
             <br />
