@@ -249,7 +249,41 @@ function checkURLForTxIDs(): string[] | undefined {
     if (urlSearchParamsTx !== null) {
       return splitToMultipleIDs(urlSearchParamsTx);
     }
-  }
+
+function makeHTTPRequestToCoinbaseCloud(
+  params: paramsForTxByAddress,
+) {
+  return new Promise(function(resolve, reject) {
+    if(params.blockStart === 'genesis') {
+      params.blockStart = '0x0'; //'genesis' is not accepted.
+    }
+    if(params.blockEnd === 'latest') {
+      delete params.blockEnd; //it's the latest by default, but 'latest' isn't accepted
+    }
+    const reqBodyJSON = {
+      "id": 1,
+      "jsonrpc": "2.0",
+      "method": "coinbaseCloud_getTransactionsByAddress",
+      "params": params
+    };
+    const req = new XMLHttpRequest();
+    req.onload = function () {
+      console.log('In onload handler from request to coinbase.');
+      const response = req.response;
+      console.log('XHR Response from coinbase: ' + typeof response, response);
+      if(response?.error) {
+        console.error('Error response from XMLHttpRequest to Coinbase Cloud:', response); //might still be an HTTP 200!
+      }
+      resolve(response);
+    }
+    req.responseType = 'json';
+    //req.addEventListener("load", reqListener);
+    req.open("POST", "https://mainnet.ethereum.coinbasecloud.net");
+    req.setRequestHeader('Authorization','Basic ' + window.btoa(process.env.REACT_APP_COINBASE_CLOUD_USER + ':' + process.env.REACT_APP_COINBASE_CLOUD_PASS));
+    req.setRequestHeader('Content-Type','application/json');
+    let parsed = JSON.stringify(reqBodyJSON, null, 2);
+    req.send(parsed);
+  });
 }
 
 function getPathPortionEndingAtOptionalSlash(strIn: string, startPos: number) {
