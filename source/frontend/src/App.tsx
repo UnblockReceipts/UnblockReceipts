@@ -190,18 +190,7 @@ function App() {
                   throw new Error('txHashInput element was not of the expected type - this should never happen.');
                 }
                 const inputValue = inputElement.value;
-                const inputValueSplit = inputValue.split(',');
-                let countRightLength = 0;
-                let countWrongLength = 0;
-                for(let inputHash of inputValueSplit) {
-                  let len = inputHash.trim().length;
-                  if(len === 66) {
-                    countRightLength++;
-                  } else if (len > 0) {
-                    countWrongLength++;
-                  }
-                }
-                if(countRightLength > 0 && countWrongLength === 0) {
+                if(membersMatchExpectedLength(inputValue, 66)) {
                   window.location.pathname = '/tx/' + inputValue;
                 }
               }}
@@ -467,6 +456,21 @@ function getPathPortionEndingAtOptionalSlash(strIn: string, startPos: number) {
 function splitToMultipleIDs(strIn: string): string[] {
   let components = strIn.split(',');
   return components.map(function(component) {return decodeURIComponent(component).trim();});
+}
+
+function membersMatchExpectedLength(possiblyCommaSeparatedList: string, expectedMemberLength: number) {
+  const inputValueSplit = possiblyCommaSeparatedList.split(',');
+  let countRightLength = 0;
+  let countWrongLength = 0;
+  for(let inputHash of inputValueSplit) {
+    let len = inputHash.trim().length;
+    if(len === expectedMemberLength) {
+      countRightLength++;
+    } else if (len > 0) {
+      countWrongLength++;
+    }
+  }
+  return (countRightLength > 0 && countWrongLength === 0);
 }
 
 //TODO: May need to rethink how this works while still avoiding issues with BigNumbers only handling integer values. Maybe inverse?
