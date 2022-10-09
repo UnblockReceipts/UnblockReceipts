@@ -104,7 +104,7 @@ function App() {
   const [txData, setTxData] = useState(function generateEmptyTxData() {
     return [] as TxRowData[];
   });
-  const getTxnData = async function(txHash: string) {
+  const getTxnData = async function(txHash: string) : Promise<TxRowData> {
     const provider = getCoinbaseNodeProvider();
     const receipt = await provider.getTransactionReceipt(txHash);
     const txn = await provider.getTransaction(txHash);
