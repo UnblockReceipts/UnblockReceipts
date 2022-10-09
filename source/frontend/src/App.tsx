@@ -369,7 +369,7 @@ async function getTxDataForAddresses(
     const timestamp = new Date(timestampInt*1000);
     const blockNumber = parseInt(blockTransaction.blockNumber);
     for(let txn of blockTransaction.transactions) {
-      const ethPriceInUSD = await getEthPriceInUSD(blockTransaction.blockTimestamp);
+      const ethPriceInUSD = await getEthPriceInUSD(timestampInt);
       const value = ethers.BigNumber.from(txn.value);
       const gasFeeETHwei = ethers.BigNumber.from(txn.gasUsed).mul(txn.gasPrice);
       const gasFeeUSDCents = convertWeiToDollars(gasFeeETHwei, ethPriceInUSD);
