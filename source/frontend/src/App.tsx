@@ -213,7 +213,7 @@ function App() {
                   window.location.pathname = '/acct/' + inputValue;
                 }
               }}
-            >Get receipt!</button> <em>Date-based filtering coming soon!</em>
+            >Get receipt!</button> <em>Date-based filtering coming in the future!</em>
             <br />
             Even more conveniently, if you control the accounts, you can click here to connect accounts of your choosing:
           </div>
