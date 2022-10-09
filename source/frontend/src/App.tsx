@@ -505,14 +505,15 @@ function convertWeiToDollars(wei: ethers.BigNumber, ethPriceInUSD: number) : num
   return parseFloat(ethers.utils.formatUnits(wei, 'ether'))*(ethPriceInUSD);
 }
 
-async function getPriceOfETHInUSD(onDate: number = 1601596800) {
-
+async function getEthPriceInUSD(blockTimestamp : number | undefined ) : Promise<number> {
+  if(typeof blockTimestamp === 'undefined') {
+    throw new Error('blockTimestamp should not be undefined for seeking exchange price.');
+  }
   var myHeaders = new Headers();
   myHeaders.append("Content-Type", "application/json");
-
   var graphql = JSON.stringify({
     query: "query oneQuery($pricedate: Int!){\n  tokens(where: { id: \"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2\"}){\n    id\n    name\n    tokenDayData(where:{ date: $pricedate }){\n      priceUSD\n    }\n  }\n}",
-    variables: {"pricedate":onDate}
+    variables: {"pricedate":blockTimestamp}
   })
   var requestOptions = {
     method: 'POST',
@@ -529,14 +530,6 @@ async function getPriceOfETHInUSD(onDate: number = 1601596800) {
       console.log(JSON.parse(result).data.tokens[0].tokenDayData[0].priceUSD);
       return JSON.parse(result).data.tokens[0].tokenDayData[0].priceUSD;
   }).catch(error => console.log('error', error));
-}
-
-//TODO: May need to rethink how this works while still avoiding issues with BigNumbers only handling integer values. Maybe inverse?
-async function getEthPriceInUSD(blockTimestamp : number | undefined ) : Promise<number> {
-  if(typeof blockTimestamp === 'undefined') {
-    throw new Error('blockTimestamp should not be undefined for seeking exchange price.');
-  }
-  return 1317.20; //temporary placeholder
 }
 
 export default App;
