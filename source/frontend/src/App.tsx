@@ -196,7 +196,26 @@ function App() {
               }}
             >Get receipt!</button>
             <br />
-            In the future, you will be able to see multiple transactions for specified account(s), starting with account(s) in your wallet:
+            Alternatively, you can use this box to get a receipt for all the transactions on an account (or more than one, separated by commas):
+            <br />
+            <input
+              id="acctInput"
+              placeholder="e.g. 0x0dc58008C371b240bAEE63Cb9D514C99d5e96c9A"
+              />
+            <button
+              onClick={(ev: React.MouseEvent) => {
+                const inputElement = document.getElementById("acctInput");
+                if(!(inputElement instanceof HTMLInputElement)) {
+                  throw new Error('acctInput element was not of the expected type - this should never happen.');
+                }
+                const inputValue = inputElement.value;
+                if(membersMatchExpectedLength(inputValue, 42)) {
+                  window.location.pathname = '/acct/' + inputValue;
+                }
+              }}
+            >Get receipt!</button>
+            <br />
+            Even more conveniently, if you control the accounts, you can click here to connect accounts of your choosing:
           </div>
           <ConnectButton />
           </>

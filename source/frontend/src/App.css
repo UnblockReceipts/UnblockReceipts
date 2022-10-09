@@ -54,6 +54,9 @@
 #txHashInput {
   width: 38em;
 }
+#acctInput {
+  width: 25em;
+}
 
 .slogan {
   font-style: italic;
