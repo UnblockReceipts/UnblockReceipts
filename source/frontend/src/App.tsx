@@ -99,7 +99,6 @@ function App() {
   const [txData, setTxData] = useState(function generateEmptyTxData() {
     return [] as TxRowData[];
   });
-  //Example txn to use: 0x60286c0fee3a46697e3ea4b04bc229f5db4b65d001d93563351fb66d81bf06b2
   const getTxnData = async function(txHash: string) {
     const provider = getCoinbaseNodeProvider();
     const receipt = await provider.getTransactionReceipt(txHash);
