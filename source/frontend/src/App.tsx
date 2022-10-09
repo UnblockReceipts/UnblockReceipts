@@ -92,9 +92,9 @@ interface paramsForTxByAddress {
 interface TxRowData {
   txID: string;
   value: ethers.BigNumber;
-  valueUSDCents: ethers.BigNumber;
+  valueUSD: number;
   gasFeeETHwei: ethers.BigNumber;
-  gasFeeUSDCents: ethers.BigNumber;
+  gasFeeUSD: number;
   timestamp: Date;
   from: string | undefined;
   to: string | undefined;
@@ -119,19 +119,19 @@ function App() {
     const gasPrice = (typeof receipt.effectiveGasPrice === 'undefined') ? txn.gasPrice : receipt.effectiveGasPrice;
     const gasUsed = (typeof receipt.gasUsed === 'undefined') ? ethers.BigNumber.from(0) : receipt.gasUsed;
     const gasFeeETHwei = (typeof gasPrice === 'undefined') ? ethers.BigNumber.from(0) : gasUsed.mul(gasPrice);
-    const gasFeeUSDCents = convertWeiToDollars(gasFeeETHwei, ethPriceInUSD);
-    const valueUSDCents = convertWeiToDollars(txn.value, ethPriceInUSD);
+    const gasFeeUSD = convertWeiToDollars(gasFeeETHwei, ethPriceInUSD);
+    const valueUSD = convertWeiToDollars(txn.value, ethPriceInUSD);
     console.log('gasPrice', gasPrice, 'gasUsed', gasUsed, 'gasFeeETHwei', gasFeeETHwei);
     const txData = {
       txID: txHash,
       value: txn.value,
-      valueUSDCents,
+      valueUSD,
       gasUsed: receipt.gasUsed,
       //cumulativeGasUsed: receipt.cumulativeGasUsed, //includes txes before the current one in the same block.
       gasPriceString: (typeof gasPrice === 'undefined') ? '' : gasPrice.toString(),
       gasLimit: txn.gasLimit,
       gasFeeETHwei,
-      gasFeeUSDCents,
+      gasFeeUSD,
       timestamp: new Date(block.timestamp*1000),
       to: receipt.to,
       from: receipt.from,
@@ -321,8 +321,8 @@ function getTxRow(txData: TxRowData) {
         <td style={{maxWidth: "10em"}}>{txData.timestamp.toString()}</td>
         <td>{ethers.utils.formatUnits(txData.value, 'ether')}</td>
         <td>{ethers.utils.formatUnits(txData.gasFeeETHwei, 'ether')}</td>
-        <td>${parseInt(txData.valueUSDCents.toString())/100}</td>
-        <td>${parseInt(txData.gasFeeUSDCents.toString())/100}</td>
+        <td>${txData.valueUSD}</td>
+        <td>${txData.gasFeeUSD}</td>
       </tr>
     );
 }
@@ -372,14 +372,14 @@ async function getTxDataForAddresses(
       const ethPriceInUSD = await getEthPriceInUSD(timestampInt);
       const value = ethers.BigNumber.from(txn.value);
       const gasFeeETHwei = ethers.BigNumber.from(txn.gasUsed).mul(txn.gasPrice);
-      const gasFeeUSDCents = convertWeiToDollars(gasFeeETHwei, ethPriceInUSD);
-      const valueUSDCents = convertWeiToDollars(ethers.BigNumber.from(txn.value), ethPriceInUSD);
+      const gasFeeUSD = convertWeiToDollars(gasFeeETHwei, ethPriceInUSD);
+      const valueUSD = convertWeiToDollars(ethers.BigNumber.from(txn.value), ethPriceInUSD);
       result.push({
         txID: txn.transactionHash,
         value,
-        valueUSDCents,
+        valueUSD,
         gasFeeETHwei,
-        gasFeeUSDCents,
+        gasFeeUSD,
         timestamp,
         from: txn.from,
         to: txn.to,
