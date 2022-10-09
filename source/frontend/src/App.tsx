@@ -119,8 +119,8 @@ function App() {
     const gasPrice = (typeof receipt.effectiveGasPrice === 'undefined') ? txn.gasPrice : receipt.effectiveGasPrice;
     const gasUsed = (typeof receipt.gasUsed === 'undefined') ? ethers.BigNumber.from(0) : receipt.gasUsed;
     const gasFeeETHwei = (typeof gasPrice === 'undefined') ? ethers.BigNumber.from(0) : gasUsed.mul(gasPrice);
-    const gasFeeUSDCents = gasFeeETHwei.mul(ethPriceInUSD);
-    const valueUSDCents = txn.value.mul(ethPriceInUSD);
+    const gasFeeUSDCents = convertWeiToDollars(gasFeeETHwei, ethPriceInUSD);
+    const valueUSDCents = convertWeiToDollars(txn.value, ethPriceInUSD);
     console.log('gasPrice', gasPrice, 'gasUsed', gasUsed, 'gasFeeETHwei', gasFeeETHwei);
     const txData = {
       txID: txHash,
@@ -371,8 +371,8 @@ async function getTxDataForAddresses(
       const ethPriceInUSD = await getEthPriceInUSD(blockTransaction.blockTimestamp);
       const value = ethers.BigNumber.from(txn.value);
       const gasFeeETHwei = ethers.BigNumber.from(txn.gasUsed).mul(txn.gasPrice);
-      const gasFeeUSDCents = gasFeeETHwei.mul(ethPriceInUSD);
-      const valueUSDCents = ethers.BigNumber.from(txn.value).mul(ethPriceInUSD);
+      const gasFeeUSDCents = convertWeiToDollars(gasFeeETHwei, ethPriceInUSD);
+      const valueUSDCents = convertWeiToDollars(ethers.BigNumber.from(txn.value), ethPriceInUSD);
       result.push({
         txID: txn.transactionHash,
         value,
@@ -495,8 +495,12 @@ function membersMatchExpectedLength(possiblyCommaSeparatedList: string, expected
   return (countRightLength > 0 && countWrongLength === 0);
 }
 
+function convertWeiToDollars(wei: ethers.BigNumber, ethPriceInUSD: number) {
+  return wei.mul(ethPriceInUSD);
+}
+
 //TODO: May need to rethink how this works while still avoiding issues with BigNumbers only handling integer values. Maybe inverse?
-async function getEthPriceInUSD(blockTimestamp : number | undefined ) : Promise<ethers.BigNumberish> {
+async function getEthPriceInUSD(blockTimestamp : number | undefined ) : Promise<number> {
   if(typeof blockTimestamp === 'undefined') {
     throw new Error('blockTimestamp should not be undefined for seeking exchange price.');
   }
