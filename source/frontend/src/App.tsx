@@ -20,8 +20,8 @@ interface ReceiptQuery {
   txHashes: string[];
   blockStart?: string;
   blockEnd?: string;
-  secStart?: string;
-  secEnd?: string;
+  msStart?: Date;
+  msEnd?: Date;
 }
 
 interface TokenTransfer {
@@ -152,6 +152,12 @@ function App() {
       }
       return await Promise.all(txDataPromises);
     } else {
+      if(typeof receiptQuery.blockStart === 'undefined' && typeof receiptQuery.msStart !== 'undefined') {
+        receiptQuery.blockStart = await getHexBlockNumberJustBeforeTimestamp(receiptQuery.msStart);
+      }
+      if(typeof receiptQuery.blockEnd === 'undefined' && typeof receiptQuery.msEnd !== 'undefined') {
+        receiptQuery.blockEnd = await getHexBlockNumberJustBeforeTimestamp(receiptQuery.msEnd);
+      }
       //get address data; TODO make these not mutually exclusive.
       return getTxDataForAddresses(receiptQuery.addresses, receiptQuery.blockStart, receiptQuery.blockEnd);
     }
@@ -343,8 +349,8 @@ function getReceiptQueryFromURL(): ReceiptQuery | undefined {
   const urlSearchParamsAddr = urlSearchParams.get("acct");
   const urlSearchParamsBlockStart = urlSearchParams.get("blockStart");
   const urlSearchParamsBlockEnd = urlSearchParams.get("blockEnd");
-  const urlSearchParamsSecStart = urlSearchParams.get("start");
-  const urlSearchParamsSecEnd = urlSearchParams.get("end");
+  const urlSearchParamsMsStart = urlSearchParams.get("start");
+  const urlSearchParamsMsEnd = urlSearchParams.get("end");
   let partialResult: Partial<ReceiptQuery> = {};
   if(urlSearchParamsBlockStart !== null) {
     partialResult.blockStart = urlSearchParamsBlockStart;
@@ -352,11 +358,11 @@ function getReceiptQueryFromURL(): ReceiptQuery | undefined {
   if(urlSearchParamsBlockEnd !== null) {
     partialResult.blockEnd = urlSearchParamsBlockEnd;
   }
-  if(urlSearchParamsSecStart !== null) {
-    partialResult.secStart = urlSearchParamsSecStart;
+  if(urlSearchParamsMsStart !== null) {
+    partialResult.msStart = new Date(urlSearchParamsMsStart);
   }
-  if(urlSearchParamsSecEnd !== null) {
-    partialResult.secEnd = urlSearchParamsSecEnd;
+  if(urlSearchParamsMsEnd !== null) {
+    partialResult.msEnd = new Date(urlSearchParamsMsEnd);
   }
   if (pathname.startsWith(SINGLE_TX_START)) {
     return Object.assign({
@@ -550,6 +556,12 @@ async function getPriceOfETHInUSD(onDate: number = 1601596800) {
 //TODO: May need to rethink how this works while still avoiding issues with BigNumbers only handling integer values. Maybe inverse?
 async function getWeiPriceInUSDCents(blockNumber : number | undefined) : Promise<ethers.BigNumberish> {
   return 1; //temporary placeholder
+}
+
+async function getHexBlockNumberJustBeforeTimestamp(
+  timestamp: Date
+) : Promise<string> {
+  return ethers.BigNumber.from((await getBlockInfoJustBeforeTimestamp(timestamp)).block).toHexString();
 }
 
 async function getBlockInfoJustBeforeTimestamp(
