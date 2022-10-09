@@ -4,6 +4,7 @@ import unblockReceiptLogo from "./images/unblockReceiptLogo.png";
 import unblockReceiptLogoTight from "./images/unblockReceiptLogoTight.png";
 import './App.css';
 import { ethers } from 'ethers';
+import EthDater from 'ethereum-block-by-date';
 
 import { ConnectButton, useConnectModal } from '@web3modal/react'
 
@@ -101,6 +102,8 @@ interface TxRowData {
   from: string | undefined;
   to: string | undefined;
 }
+
+const dater = new EthDater(new ethers.providers.CloudflareProvider());
 
 function App() {
   const { isOpen, open, close } = useConnectModal()
@@ -547,6 +550,12 @@ async function getPriceOfETHInUSD(onDate: number = 1601596800) {
 //TODO: May need to rethink how this works while still avoiding issues with BigNumbers only handling integer values. Maybe inverse?
 async function getWeiPriceInUSDCents(blockNumber : number | undefined) : Promise<ethers.BigNumberish> {
   return 1; //temporary placeholder
+}
+
+async function getBlockInfoJustBeforeTimestamp(
+  timestamp: Date
+) : Promise<EthDater.BlockResult> {
+  return dater.getDate(timestamp, false, false);
 }
 
 export default App;
