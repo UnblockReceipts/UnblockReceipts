@@ -7,6 +7,13 @@ import { ethers } from 'ethers';
 
 import { ConnectButton, useConnectModal } from '@web3modal/react'
 
+type MODE = 'tx' | 'acct';
+
+interface DataForDisplay {
+  mode: MODE;
+  TxRows: TxRowData[];
+}
+
 interface TxRowData {
   txID: string;
   value: ethers.BigNumber;
