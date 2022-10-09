@@ -141,7 +141,7 @@ function App() {
             alt="logo"
             style={{ height: "5em", padding: "1em" }}
         />
-        <span className="slogan">Spend your tokens, not your time</span>
+        <span className="slogan">Spend your tokens, not your time!</span>
         <h1 style={{textAlign: "center" }}>
           Decentralized network transaction receipt
         </h1>
