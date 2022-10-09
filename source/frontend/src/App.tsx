@@ -102,7 +102,7 @@ interface TxRowData {
 
 function App() {
   const { isOpen, open, close } = useConnectModal()
-  const receiptQuery = checkURLForTxIDs();
+  const receiptQuery = getReceiptQueryFromURL();
   const [txData, setTxData] = useState(function generateEmptyTxData() {
     return [] as TxRowData[];
   });
@@ -327,7 +327,7 @@ function getTxRow(txData: TxRowData) {
     );
 }
 
-function checkURLForTxIDs(): ReceiptQuery | undefined {
+function getReceiptQueryFromURL(): ReceiptQuery | undefined {
   //TODO: This currently ignores addresses if any transactions are defined;
   //they could technically coexist.
   const pathname = window.location.pathname;
