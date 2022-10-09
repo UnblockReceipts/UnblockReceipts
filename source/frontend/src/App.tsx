@@ -143,11 +143,11 @@ function App() {
   const getTxnsData = async function(receiptQuery: ReceiptQuery) : Promise<TxRowData[]> {
     const txHashes = receiptQuery.txHashes;
     if(txHashes.length > 0){
-    const txDataPromises : Promise<TxRowData>[] = [];
-    for(let txHash of txHashes) {
-      txDataPromises.push(getTxnData(txHash));
-    }
-    return await Promise.all(txDataPromises);
+      const txDataPromises : Promise<TxRowData>[] = [];
+      for(let txHash of txHashes) {
+        txDataPromises.push(getTxnData(txHash));
+      }
+      return await Promise.all(txDataPromises);
     } else {
       //get address data; TODO make these not mutually exclusive.
       return getTxDataForAddresses(receiptQuery.addresses, receiptQuery.blockStart, receiptQuery.blockEnd);
