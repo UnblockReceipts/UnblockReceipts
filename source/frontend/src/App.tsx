@@ -270,6 +270,9 @@ async function convertAddressesToTxList(addresses: string[], blockStart: string 
 
 async function getAllTxDataAboutAddress(address: string, blockStart: string = 'genesis', blockEnd: string = 'latest') : Promise<string[]> {
   let result: string[] = [];
+  if(blockStart === 'genesis') {
+    blockStart = '0x0'; //'genesis' is not accepted.
+  }
   //TODO: Handle pagination
   const singleCallResult = await makeHTTPRequestToCoinbaseCloud({
     address,
@@ -288,9 +291,6 @@ function makeHTTPRequestToCoinbaseCloud(
   params: paramsForTxByAddress,
 ) {
   return new Promise(function(resolve, reject) {
-    if(params.blockStart === 'genesis') {
-      params.blockStart = '0x0'; //'genesis' is not accepted.
-    }
     if(params.blockEnd === 'latest') {
       delete params.blockEnd; //it's the latest by default, but 'latest' isn't accepted
     }
