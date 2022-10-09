@@ -4,7 +4,7 @@
 2. `npm i`
 
 In a new terminal:
-0. `Copy .env.example to .env in the same location and replace the variables with your own values.`
+0. Copy .env.example to .env in the same location and replace the ellipses with your own values.
 1. `cd source/frontend`
 2. `yarn install`
 3. `yarn start` (which will open a browser to localhost:3000)
