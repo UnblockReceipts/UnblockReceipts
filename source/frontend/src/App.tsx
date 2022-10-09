@@ -326,7 +326,8 @@ function getCoinbaseNodeProvider() {
 function getTxRow(txData: TxRowData) {
     return (
       <tr className="singleTxReceipt" key={txData.txID}>
-        <td style={{maxWidth: "10em"}}><span className="txID">{txData.txID}</span></td>
+        <td style={{maxWidth: "10em"}}><a className="txID"
+        href={'https://etherscan.io/tx/' + txData.txID} target='_blank'>{txData.txID}</a></td>
         <td style={{maxWidth: "10em"}}>{txData.from}</td>
         <td style={{maxWidth: "10em"}}>{txData.to}</td>
         <td style={{maxWidth: "10em"}}>{txData.timestamp.toString()}</td>
