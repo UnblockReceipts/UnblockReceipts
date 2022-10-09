@@ -318,7 +318,11 @@ function checkURLForTxIDs(): string[] | undefined {
   }
 }
 
-async function convertAddressesToTxList(addresses: string[], blockStart: string = 'genesis', blockEnd: string = 'latest') : Promise<BlockTransaction[]> {
+async function convertAddressesToTxList(
+  addresses: string[],
+  blockStart: string = 'genesis',
+  blockEnd: string = 'latest'
+) : Promise<BlockTransaction[]> {
   let result = [];
   for(let address of addresses) {
     result.push(...(await getAllTxDataAboutAddress(address, blockStart, blockEnd)));
@@ -326,7 +330,12 @@ async function convertAddressesToTxList(addresses: string[], blockStart: string 
   return result;
 }
 
-async function getAllTxDataAboutAddress(address: string, blockStart: string = 'genesis', blockEnd: string = 'latest', resultBlockSet: BlockTransaction[] = []) : Promise<BlockTransaction[]> {
+async function getAllTxDataAboutAddress(
+  address: string,
+  blockStart: string = 'genesis',
+  blockEnd: string = 'latest',
+  resultBlockSet: BlockTransaction[] = []
+) : Promise<BlockTransaction[]> {
   if(blockStart === 'genesis') {
     blockStart = '0x0'; //'genesis' is not accepted.
   }
