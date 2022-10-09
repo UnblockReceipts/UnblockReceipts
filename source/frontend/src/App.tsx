@@ -146,45 +146,45 @@ function App() {
           Decentralized network transaction receipt
         </h1>
         <div className="receiptAndExplanationWrapper">
-        <table className="txReceiptsTable">
-          <thead>
-            <tr>
-              <td>
-                Transaction ID
-              </td>
-              <td>
-                From
-              </td>
-              <td>
-                To
-              </td>
-              <td title="This transaction took place on">
-                Date/Time
-              </td>
-              <td>
-                ETH sent (ETH)
-              </td>
-              <td>
-                Tx fee (ETH)
-              </td>
-              <td>
-                ETH sent (USD)
-              </td>
-              <td>
-                Tx fee (USD)
-              </td>
-            </tr>
-          </thead>
-        <tbody>
-          {
-            txData.map(getTxRow)
-          }
-        </tbody>
-        </table>
-        <p className="explanation">
-          On this decentralized network, the "transaction fee" (abbreviated "Tx fee") incentivizes network participants to
-          do the work needed to include this transaction in the ledger.
-        </p>
+          <table className="txReceiptsTable">
+            <thead>
+              <tr>
+                <td>
+                  Transaction ID
+                </td>
+                <td>
+                  From
+                </td>
+                <td>
+                  To
+                </td>
+                <td title="This transaction took place on">
+                  Date/Time
+                </td>
+                <td>
+                  ETH sent (ETH)
+                </td>
+                <td>
+                  Tx fee (ETH)
+                </td>
+                <td>
+                  ETH sent (USD)
+                </td>
+                <td>
+                  Tx fee (USD)
+                </td>
+              </tr>
+            </thead>
+            <tbody>
+              {
+                txData.map(getTxRow)
+              }
+            </tbody>
+          </table>
+          <p className="explanation">
+            On this decentralized network, the "transaction fee" (abbreviated "Tx fee") incentivizes network participants to
+            do the work needed to include this transaction in the ledger.
+          </p>
         </div>
       </>
     );
