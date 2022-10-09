@@ -246,7 +246,7 @@ function App() {
           This is a receipt for
           {receiptQuery.txHashes.length > 0 ?
           (receiptQuery.txHashes.length === 1 ? ' a specified transaction' : ' specified transactions') :
-          ((receiptQuery.addresses.length === 1 ? ' a specified account' : ' specified accounts'))}.
+          (' the entire history of ' + (receiptQuery.addresses.length === 1 ? ' a specified account' : ' specified accounts'))}.
         </p>
         {txData.length > 0 ? '' :
           <p className="mode">Data has not yet finished loading.</p>
