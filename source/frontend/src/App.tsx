@@ -114,13 +114,13 @@ function App() {
       throw new Error ('Got undefined block number in receipt for tx '+txHash);
     }
     const block = await provider.getBlock(receipt.blockNumber);
-    const weiPriceInUSDCents = await getEthPriceInUSD(block.timestamp);
+    const ethPriceInUSD = await getEthPriceInUSD(block.timestamp);
     //@ts-ignore that effectiveGasPrice might be undefined - it's undocumented but sometimes there.
     const gasPrice = (typeof receipt.effectiveGasPrice === 'undefined') ? txn.gasPrice : receipt.effectiveGasPrice;
     const gasUsed = (typeof receipt.gasUsed === 'undefined') ? ethers.BigNumber.from(0) : receipt.gasUsed;
     const gasFeeETHwei = (typeof gasPrice === 'undefined') ? ethers.BigNumber.from(0) : gasUsed.mul(gasPrice);
-    const gasFeeUSDCents = gasFeeETHwei.mul(weiPriceInUSDCents);
-    const valueUSDCents = txn.value.mul(weiPriceInUSDCents);
+    const gasFeeUSDCents = gasFeeETHwei.mul(ethPriceInUSD);
+    const valueUSDCents = txn.value.mul(ethPriceInUSD);
     console.log('gasPrice', gasPrice, 'gasUsed', gasUsed, 'gasFeeETHwei', gasFeeETHwei);
     const txData = {
       txID: txHash,
@@ -368,11 +368,11 @@ async function getTxDataForAddresses(
     const timestamp = new Date(parseInt(blockTransaction.blockTimestamp, 16)*1000);
     const blockNumber = parseInt(blockTransaction.blockNumber);
     for(let txn of blockTransaction.transactions) {
-      const weiPriceInUSDCents = await getEthPriceInUSD(blockTransaction.blockTimestamp);
+      const ethPriceInUSD = await getEthPriceInUSD(blockTransaction.blockTimestamp);
       const value = ethers.BigNumber.from(txn.value);
       const gasFeeETHwei = ethers.BigNumber.from(txn.gasUsed).mul(txn.gasPrice);
-      const gasFeeUSDCents = gasFeeETHwei.mul(weiPriceInUSDCents);
-      const valueUSDCents = ethers.BigNumber.from(txn.value).mul(weiPriceInUSDCents);
+      const gasFeeUSDCents = gasFeeETHwei.mul(ethPriceInUSD);
+      const valueUSDCents = ethers.BigNumber.from(txn.value).mul(ethPriceInUSD);
       result.push({
         txID: txn.transactionHash,
         value,
