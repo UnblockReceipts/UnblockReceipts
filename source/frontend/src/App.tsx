@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Navbar from "./components/Header";
 import unblockReceiptLogo from "./images/unblockReceiptLogo.png";
+import unblockReceiptLogoTight from "./images/unblockReceiptLogoTight.png";
 import './App.css';
 import { ethers } from 'ethers';
 
@@ -135,10 +136,10 @@ function App() {
       <>
         {/*<Navbar />*/}
         <img
-            src={unblockReceiptLogo}
+            src={unblockReceiptLogoTight}
             className="App-logo"
             alt="logo"
-            style={{ height: "180px", paddingBottom: "1rem" }}
+            style={{ height: "5em", padding: "1em" }}
         />
         <span className="slogan">Spend your tokens, not your time</span>
         <h1>
