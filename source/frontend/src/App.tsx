@@ -360,10 +360,10 @@ function getReceiptQueryFromURL(): ReceiptQuery | undefined {
     partialResult.blockEnd = urlSearchParamsBlockEnd.startsWith('0x') ? urlSearchParamsBlockEnd : convertToHex(urlSearchParamsBlockEnd);
   }
   if(urlSearchParamsMsStart !== null) {
-    partialResult.msStart = new Date(urlSearchParamsMsStart);
+    partialResult.msStart = new Date(parseInt(urlSearchParamsMsStart));
   }
   if(urlSearchParamsMsEnd !== null) {
-    partialResult.msEnd = new Date(urlSearchParamsMsEnd);
+    partialResult.msEnd = new Date(parseInt(urlSearchParamsMsEnd));
   }
   if (pathname.startsWith(SINGLE_TX_START)) {
     return Object.assign({
