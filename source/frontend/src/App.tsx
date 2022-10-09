@@ -252,6 +252,13 @@ function App() {
             Even more conveniently, if you control the accounts, you can click here to connect accounts of your choosing:
           </div>
           <ConnectButton />
+          <br />
+          <br />
+          <small><em>
+            Note: This project was developed by a small team in a one-day hackathon.
+            <br />
+            It is far from feature-complete and might have bugs, but might also still be useful at this early point.
+            </em></small>
           </>
           ) : (
               <h1>he</h1>
@@ -341,6 +348,10 @@ function App() {
             Conversion rates are drawn from <a href="https://thegraph.com/" target="_blank">The Graph's</a>
             <a href="https://docs.uniswap.org/protocol/V2/reference/API/entities" target="_blank"> subgraph/index</a> of
             Uniswap market pricing as of the date of each transaction listed above.
+          </p>
+          <p className="explanation">
+            This project was developed by a small team in a one-day hackathon.
+            It is far from feature-complete and might have bugs, but might also still be useful at this early point.
           </p>
         </div>
       </>
