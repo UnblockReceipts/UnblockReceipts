@@ -241,13 +241,24 @@ function getTxRow(txData: TxRowData) {
 function checkURLForTxIDs(): string[] | undefined {
   const pathname = window.location.pathname;
   const SINGLE_TX_START = "/tx/";
+  const ADDRESS_START = "/addr/";
   if (pathname.startsWith(SINGLE_TX_START)) {
     return splitToMultipleIDs(getPathPortionEndingAtOptionalSlash(pathname, SINGLE_TX_START.length));
   } else {
     const urlSearchParams = new URLSearchParams(window.location.search);
     const urlSearchParamsTx = urlSearchParams.get("tx");
+    const urlSearchParamsAddr = urlSearchParams.get("addr");
     if (urlSearchParamsTx !== null) {
       return splitToMultipleIDs(urlSearchParamsTx);
+    } else if(pathname.startsWith(ADDRESS_START)) {
+      const addresses = splitToMultipleIDs(getPathPortionEndingAtOptionalSlash(pathname, ADDRESS_START.length));
+      convertAddressesToTxList(addresses).then(console.log);
+    } else if(urlSearchParamsAddr !== null) {
+      const addresses = splitToMultipleIDs(urlSearchParamsAddr);
+      convertAddressesToTxList(addresses).then(console.log);
+    }
+  }
+}
 
 async function convertAddressesToTxList(addresses: string[], blockStart: string = 'genesis', blockEnd: string = 'latest') : Promise<string[]> {
   let result = [];
