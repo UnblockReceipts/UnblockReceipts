@@ -281,6 +281,10 @@ function App() {
             On this decentralized network, the "transaction fee" (abbreviated "Tx fee") incentivizes network participants to
             do the work needed to include this transaction in the ledger.
           </p>
+          <p className="explanation">
+            The time zone displayed above is based on viewer system settings, and does not necessarily reflect the time zone the
+            person who initiated this transaction may have been in.
+          </p>
         </div>
       </>
     );
