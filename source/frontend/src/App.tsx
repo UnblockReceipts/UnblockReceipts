@@ -24,7 +24,7 @@ interface ReceiptQuery {
 interface TokenTransfer {
   //https://docs.cloud.coinbase.com/node/reference/advanced-api-reference#tokentransfer
   tokenAddress: string;
-  tokenType:  "erc20" | "erc721";
+  tokenType: "erc20" | "erc721";
   from: string;
   to: string;
   value: string; // For ERC-20, gives quantity of tokens transferred. For ERC-721, gives list of token IDs of the token transferred
