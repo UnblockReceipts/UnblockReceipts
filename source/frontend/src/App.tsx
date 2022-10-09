@@ -136,10 +136,7 @@ function App() {
     };
     return txData;
   }
-  const getTxnsData = async function(receiptQuery: ReceiptQuery | undefined) {
-    if(typeof receiptQuery === 'undefined') {
-      return;
-    }
+  const getTxnsData = async function(receiptQuery: ReceiptQuery) {
     const txHashes = receiptQuery.txHashes;
     if(txHashes.length > 0){
     const txDataPromises : Promise<TxRowData>[] = [];
@@ -154,7 +151,13 @@ function App() {
     setTxData(txData);
     return txData;
   }
-  useEffect(() => { getTxnsData(receiptQuery); },[]); //https://stackoverflow.com/a/71434389/
+  const getAndDisplayTxnsData = async function(receiptQuery: ReceiptQuery | undefined) {
+    if(typeof receiptQuery === 'undefined') {
+      return;
+    }
+    return getTxnsData(receiptQuery);
+  }
+  useEffect(() => { getAndDisplayTxnsData(receiptQuery); },[]); //https://stackoverflow.com/a/71434389/
   if(typeof receiptQuery === 'undefined') {
     return (
       <>
