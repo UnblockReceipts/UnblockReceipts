@@ -321,7 +321,7 @@ function checkURLForTxIDs(): ReceiptQuery | undefined {
   //they could technically coexist.
   const pathname = window.location.pathname;
   const SINGLE_TX_START = "/tx/";
-  const ADDRESS_START = "/addr/";
+  const ADDRESS_START = "/acct/";
   if (pathname.startsWith(SINGLE_TX_START)) {
     return {
       txHashes: splitToMultipleIDs(getPathPortionEndingAtOptionalSlash(pathname, SINGLE_TX_START.length)),
@@ -330,7 +330,7 @@ function checkURLForTxIDs(): ReceiptQuery | undefined {
   } else {
     const urlSearchParams = new URLSearchParams(window.location.search);
     const urlSearchParamsTx = urlSearchParams.get("tx");
-    const urlSearchParamsAddr = urlSearchParams.get("addr");
+    const urlSearchParamsAddr = urlSearchParams.get("acct");
     if (urlSearchParamsTx !== null) {
       return {
         txHashes: splitToMultipleIDs(urlSearchParamsTx),
