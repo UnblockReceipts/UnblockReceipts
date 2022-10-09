@@ -405,8 +405,10 @@ async function showAddress(hexAddress: string) : Promise<string> {
   const provider = new ethers.providers.CloudflareProvider();
   const reverseLookup = await provider.lookupAddress(hexAddress);
   if(reverseLookup === null) {
+    //console.log('Reverse lookup for ' + hexAddress + ' found no ENS name.');
     return hexAddress;
   } else {
+    //console.log('Reverse lookup for ' + hexAddress + ' found ENS name ' + reverseLookup);
     return reverseLookup;
   }
 }
@@ -463,7 +465,9 @@ async function getTxDataForAddresses(
   blockStart: string = 'genesis',
   blockEnd: string = 'latest'
 ) : Promise<TxRowData[]> {
+  //console.log('About to convert addresses: ',addresses);
   const convertedAddresses = await resolveENSsIfNecessary(addresses);
+  //console.log('Converted to: ',convertedAddresses);
   const blockTransactions = await convertAddressesToTxList(convertedAddresses, blockStart, blockEnd);
   let result: TxRowData[] = [];
   for(let blockTransaction of blockTransactions) {
