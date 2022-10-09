@@ -143,7 +143,7 @@ function App() {
         />
         <span className="slogan">Spend your tokens, not your time!</span>
         <h1 style={{textAlign: "center" }}>
-          Decentralized network transaction receipt
+          Transaction receipt
         </h1>
         <div className="receiptAndExplanationWrapper">
           <table className="txReceiptsTable">
