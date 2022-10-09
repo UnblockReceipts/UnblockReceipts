@@ -509,6 +509,11 @@ async function getEthPriceInUSD(blockTimestamp : number | undefined ) : Promise<
   if(typeof blockTimestamp === 'undefined') {
     throw new Error('blockTimestamp should not be undefined for seeking exchange price.');
   }
+  let blockDateObj = new Date(blockTimestamp*1000); //ms will already be 0
+  blockDateObj.setUTCHours(0);
+  blockDateObj.setUTCMinutes(0);
+  blockDateObj.setUTCSeconds(0);
+  blockTimestamp = blockDateObj.valueOf()/1000;
   var myHeaders = new Headers();
   myHeaders.append("Content-Type", "application/json");
   var graphql = JSON.stringify({
