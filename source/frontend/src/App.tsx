@@ -505,7 +505,7 @@ async function getEthPriceInUSD(blockTimestamp : number | undefined ) : Promise<
   if(typeof blockTimestamp === 'undefined') {
     throw new Error('blockTimestamp should not be undefined for seeking exchange price.');
   }
-  return 1; //temporary placeholder
+  return 1317.20; //temporary placeholder
 }
 
 export default App;
