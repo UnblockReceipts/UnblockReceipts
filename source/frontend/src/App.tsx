@@ -106,7 +106,7 @@ interface TxRowData {
 const dater = new EthDater(new ethers.providers.CloudflareProvider());
 
 function App() {
-  const { isOpen, open, close } = useConnectModal()
+  const { isOpen, open, close } = useConnectModal();
   const receiptQuery = getReceiptQueryFromURL();
   const [txData, setTxData] = useState(function generateEmptyTxData() {
     return [] as TxRowData[];
