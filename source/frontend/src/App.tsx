@@ -137,12 +137,14 @@ function App() {
     return (
       <>
         {/*<Navbar />*/}
+        <a href='/'>
         <img
             src={unblockReceiptLogoTight}
             className="App-logo"
             alt="logo"
             style={{ height: "5em", padding: "1em" }}
         />
+        </a>
         <span className="slogan">Spend your tokens, not your time!</span>
         <h1 style={{textAlign: "center" }}>
           Transaction receipt
