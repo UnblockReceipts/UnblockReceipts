@@ -19,6 +19,8 @@ interface ReceiptQuery {
   txHashes: string[];
   blockStart?: string;
   blockEnd?: string;
+  secStart?: string;
+  secEnd?: string;
 }
 
 interface TokenTransfer {
@@ -338,6 +340,8 @@ function getReceiptQueryFromURL(): ReceiptQuery | undefined {
   const urlSearchParamsAddr = urlSearchParams.get("acct");
   const urlSearchParamsBlockStart = urlSearchParams.get("blockStart");
   const urlSearchParamsBlockEnd = urlSearchParams.get("blockEnd");
+  const urlSearchParamsSecStart = urlSearchParams.get("start");
+  const urlSearchParamsSecEnd = urlSearchParams.get("end");
   let partialResult: Partial<ReceiptQuery> = {};
   if(urlSearchParamsBlockStart === null) {
 
@@ -348,6 +352,12 @@ function getReceiptQueryFromURL(): ReceiptQuery | undefined {
 
   } else {
     partialResult.blockEnd = urlSearchParamsBlockEnd;
+  }
+  if(urlSearchParamsSecStart !== null) {
+    partialResult.secStart = urlSearchParamsSecStart;
+  }
+  if(urlSearchParamsSecEnd !== null) {
+    partialResult.secEnd = urlSearchParamsSecEnd;
   }
   if (pathname.startsWith(SINGLE_TX_START)) {
     return Object.assign({
