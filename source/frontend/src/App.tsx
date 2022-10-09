@@ -496,8 +496,8 @@ function membersMatchExpectedLength(possiblyCommaSeparatedList: string, expected
   return (countRightLength > 0 && countWrongLength === 0);
 }
 
-function convertWeiToDollars(wei: ethers.BigNumber, ethPriceInUSD: number) {
-  return wei.mul(ethPriceInUSD);
+function convertWeiToDollars(wei: ethers.BigNumber, ethPriceInUSD: number) : number {
+  return parseFloat(ethers.utils.formatUnits(wei, 'ether'))*(ethPriceInUSD);
 }
 
 //TODO: May need to rethink how this works while still avoiding issues with BigNumbers only handling integer values. Maybe inverse?
