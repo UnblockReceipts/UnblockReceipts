@@ -241,9 +241,7 @@ function App() {
                   throw new Error('acctInput element was not of the expected type - this should never happen.');
                 }
                 const inputValue = inputElement.value.length > 0 ? inputElement.value : address;
-                if(membersMatchExpectedLength(inputValue, 42)) {
-                  window.location.search = '?acct=' + inputValue;
-                }
+                window.location.search = '?acct=' + inputValue;
               }}
             >Get receipt!</button> <em>Date-based filtering coming in the future!</em>
             <br />
