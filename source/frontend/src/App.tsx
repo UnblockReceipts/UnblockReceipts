@@ -224,7 +224,7 @@ function App() {
                 }
                 const inputValue = inputElement.value;
                 if(membersMatchExpectedLength(inputValue, 66)) {
-                  window.location.pathname = '/tx/' + inputValue;
+                  window.location.search = '?tx=' + inputValue;
                 }
               }}
             >Get receipt!</button>
@@ -244,7 +244,7 @@ function App() {
                 }
                 const inputValue = address;
                 if(membersMatchExpectedLength(inputValue, 42)) {
-                  window.location.pathname = '/acct/' + inputValue;
+                  window.location.search = '?acct=' + inputValue;
                 }
               }}
             >Get receipt!</button> <em>Date-based filtering coming in the future!</em>
