@@ -551,9 +551,7 @@ function makeHTTPRequestToCoinbaseCloud(
     };
     const req = new XMLHttpRequest();
     req.onload = function () {
-      console.log('In onload handler from request to coinbase.');
       const response = req.response;
-      console.log('XHR Response from coinbase: ' + typeof response, response);
       if(response?.error) {
         console.error('Error response from XMLHttpRequest to Coinbase Cloud:', response); //might still be an HTTP 200!
       }
