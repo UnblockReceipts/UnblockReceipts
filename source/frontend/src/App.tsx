@@ -298,6 +298,11 @@ function App() {
             The time zone displayed above is based on viewer system settings, and does not necessarily reflect the time zone the
             person who initiated this transaction may have been in.
           </p>
+          <p className="explanation">
+            Conversion rates are drawn from <a href="https://thegraph.com/" target="_blank">The Graph's</a>
+            <a href="https://docs.uniswap.org/protocol/V2/reference/API/entities" target="_blank"> subgraph/index</a> of
+            Uniswap market pricing as of the date of each transaction listed above.
+          </p>
         </div>
       </>
     );
