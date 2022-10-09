@@ -336,23 +336,36 @@ function getReceiptQueryFromURL(): ReceiptQuery | undefined {
   const urlSearchParams = new URLSearchParams(window.location.search);
   const urlSearchParamsTx = urlSearchParams.get("tx");
   const urlSearchParamsAddr = urlSearchParams.get("acct");
+  const urlSearchParamsBlockStart = urlSearchParams.get("blockStart");
+  const urlSearchParamsBlockEnd = urlSearchParams.get("blockEnd");
+  let partialResult: Partial<ReceiptQuery> = {};
+  if(urlSearchParamsBlockStart === null) {
+
+  } else {
+    partialResult.blockStart = urlSearchParamsBlockStart;
+  }
+  if(urlSearchParamsBlockEnd === null) {
+
+  } else {
+    partialResult.blockEnd = urlSearchParamsBlockEnd;
+  }
   if (pathname.startsWith(SINGLE_TX_START)) {
-    return {
+    return Object.assign({
       txHashes: splitToMultipleIDs(getPathPortionEndingAtOptionalSlash(pathname, SINGLE_TX_START.length)),
       addresses: [],
-    };
+    }, partialResult);
   } else {
     if (urlSearchParamsTx !== null) {
-      return {
+      return Object.assign({
         txHashes: splitToMultipleIDs(urlSearchParamsTx),
         addresses: [],
-      };
+      }, partialResult);
     } else if(pathname.startsWith(ADDRESS_START)) {
       const addresses = splitToMultipleIDs(getPathPortionEndingAtOptionalSlash(pathname, ADDRESS_START.length));
-      return {addresses, txHashes: []};
+      return Object.assign({addresses, txHashes: []}, partialResult);
     } else if(urlSearchParamsAddr !== null) {
       const addresses = splitToMultipleIDs(urlSearchParamsAddr);
-      return {addresses, txHashes: []};
+      return Object.assign({addresses, txHashes: []}, partialResult);
     }
   }
 }
