@@ -114,7 +114,7 @@ function App() {
       throw new Error ('Got undefined block number in receipt for tx '+txHash);
     }
     const block = await provider.getBlock(receipt.blockNumber);
-    const weiPriceInUSDCents = await getWeiPriceInUSDCents(block.timestamp);
+    const weiPriceInUSDCents = await getEthPriceInUSD(block.timestamp);
     //@ts-ignore that effectiveGasPrice might be undefined - it's undocumented but sometimes there.
     const gasPrice = (typeof receipt.effectiveGasPrice === 'undefined') ? txn.gasPrice : receipt.effectiveGasPrice;
     const gasUsed = (typeof receipt.gasUsed === 'undefined') ? ethers.BigNumber.from(0) : receipt.gasUsed;
@@ -368,7 +368,7 @@ async function getTxDataForAddresses(
     const timestamp = new Date(parseInt(blockTransaction.blockTimestamp, 16)*1000);
     const blockNumber = parseInt(blockTransaction.blockNumber);
     for(let txn of blockTransaction.transactions) {
-      const weiPriceInUSDCents = await getWeiPriceInUSDCents(blockTransaction.blockTimestamp);
+      const weiPriceInUSDCents = await getEthPriceInUSD(blockTransaction.blockTimestamp);
       const value = ethers.BigNumber.from(txn.value);
       const gasFeeETHwei = ethers.BigNumber.from(txn.gasUsed).mul(txn.gasPrice);
       const gasFeeUSDCents = gasFeeETHwei.mul(weiPriceInUSDCents);
@@ -496,7 +496,7 @@ function membersMatchExpectedLength(possiblyCommaSeparatedList: string, expected
 }
 
 //TODO: May need to rethink how this works while still avoiding issues with BigNumbers only handling integer values. Maybe inverse?
-async function getWeiPriceInUSDCents(blockTimestamp : number | undefined ) : Promise<ethers.BigNumberish> {
+async function getEthPriceInUSD(blockTimestamp : number | undefined ) : Promise<ethers.BigNumberish> {
   if(typeof blockTimestamp === 'undefined') {
     throw new Error('blockTimestamp should not be undefined for seeking exchange price.');
   }
