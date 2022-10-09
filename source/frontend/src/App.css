@@ -43,6 +43,7 @@
 
 .txReceiptsTable {
   border-collapse: collapse;
+  margin: 10px;
 }
 
 .txReceiptsTable tbody tr {
