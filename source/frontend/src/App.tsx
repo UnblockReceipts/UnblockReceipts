@@ -153,6 +153,9 @@ function App() {
           This is a receipt for
           {txData.length === 1 ? ' a specified transaction' : ' specified transactions'}.
         </p>
+        {txData.length > 0 ? '' :
+          <p className="mode">Data has not yet finished loading.</p>
+        }
         <div className="receiptAndExplanationWrapper">
           <table className="txReceiptsTable">
             <thead>
