@@ -158,7 +158,6 @@ function App() {
     const txData = await getTxnsData(receiptQuery);
     console.log('txData:',txData);
     setTxData(txData);
-
     return txData;
   }
   useEffect(() => { getAndDisplayTxnsData(receiptQuery); },[]); //https://stackoverflow.com/a/71434389/
