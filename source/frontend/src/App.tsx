@@ -166,16 +166,16 @@ function App() {
                   Date/Time
                 </td>
                 <td>
-                  ETH sent (ETH)
+                  ETH sent<br />(ETH)
                 </td>
                 <td>
-                  Tx fee (ETH)
+                  Tx fee<br />(ETH)
                 </td>
                 <td>
-                  ETH sent (USD)
+                  ETH sent<br />(USD)
                 </td>
                 <td>
-                  Tx fee (USD)
+                  Tx fee<br />(USD)
                 </td>
               </tr>
             </thead>
